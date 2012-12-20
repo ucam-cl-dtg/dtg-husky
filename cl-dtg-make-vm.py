@@ -15,7 +15,7 @@ INSTALLREPO       = 'http://www-uxsup.csx.cam.ac.uk/pub/linux/ubuntu'
 PRESEEDLOCATION   = 'http://puppy8.dtg.cl.cam.ac.uk/alloptions.cfg'
 
 # Filesystem
-DEFAULTROOTFSSIZE = 15
+DEFAULTROOTFSSIZE = '15'
 DEFAULTSR         = 'NFS\ virtual\ disk\ storage'
 
 # Networking
