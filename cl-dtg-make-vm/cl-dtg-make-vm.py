@@ -28,50 +28,56 @@ DEFAULTMEMORY     = '2048'
 
 @hosts(dom0)
 def new_vm(name, ip="", mac="", memory=DEFAULTMEMORY, vcpus=DEFAULTVCPUs, root_fs_size=DEFAULTROOTFSSIZE, fs_location=DEFAULTSR):
-    """ Create a new VM """
+    """
+    Create a new VM
+    """
     if ip != "":
         mac = ip_to_mac(ip)
     if mac == "":
         mac = next_mac()
 
     # Create a VM
-    new_vm = run('xe vm-install new-name-label=' + name + ' template=' + TEMPLATE + ' sr-name-label=' + fs_location)
+    new_vm = run('xe vm-install new-name-label=%s template=%s sr-name-label=%s' % (name, TEMPLATE, fs_location))
 
     # Point VM at install repo
-    run('xe vm-param-set uuid=' + new_vm + ' other-config:install-repository=' + INSTALLREPO)
+    run('xe vm-param-set uuid=%s other-config:install-repository=%s' % (new_vm, INSTALLREPO))
 
     # Give the VM a VIF
-    run('xe vif-create network-uuid=' + NETWORK + ' mac=' + mac + ' vm-uuid=' + new_vm + ' device=' + DEVICE)
+    run('xe vif-create network-uuid=%s mac=%s vm-uuid=%s device=%s' % (NETWORK, mac, new_vm, DEVICE))
 
     # Set the disk size
-    vdi_uuid = run('xe vm-disk-list vm=' + name + ' |grep uuid | sed -e \'s/.*: //\' | tail -n 1')
-    run('xe vdi-resize uuid=' + vdi_uuid + ' disk-size=' + root_fs_size + 'GiB')
+    vdi_uuid = run('xe vm-disk-list vm=%s |grep uuid | sed -e \'s/.*: //\' | tail -n 1' % name)
+    run('xe vdi-resize uuid=%s disk-size=%sGiB' % ( vdi_uuid, root_fs_size))
 
     # Give the VM enough memory, and VCPU
-    run('xe vm-param-set uuid=' + new_vm + ' VCPUs-max=' + vcpus)
-    run('xe vm-param-set uuid=' + new_vm + ' VCPUs-at-startup=' + vcpus)
-    run('xe vm-memory-limits-set uuid=' + new_vm + ' dynamic-max=' + memory + 'MiB static-max=' + memory + 'MiB static-min=' + memory + 'MiB dynamic-min=' + memory + 'MiB')
+    run('xe vm-param-set uuid=%s VCPUs-max=%s' % (new_vm, vcpus))
+    run('xe vm-param-set uuid=%s  VCPUs-at-startup=%s'  % (new_vm,vcpus))
+    run('xe vm-memory-limits-set uuid=%s dynamic-max=%sMiB static-max=%sMiB static-min=%sMiB dynamic-min=%sMiB' % (new_vm, memory, memory, memory, memory))
 
     # Set the preseed file, and pass a hostname, and password hash
-    run('xe vm-param-set uuid=' + new_vm + ' PV-args=" --quiet console=hvc0 auto=true url=' + PRESEEDLOCATION  + ' netcfg/get_hostname=' + name + '"')
+    run('xe vm-param-set uuid=%s PV-args=" --quiet console=hvc0 auto=true url=%s netcfg/get_hostname=%s"' % (new_vm, PRESEEDLOCATION, name))
 
     # Boot the VM, with an answer file
-    run('xe vm-start vm=' + name)
+    run('xe vm-start vm=%s' % name)
 
 @hosts(dhcp)
 def ip_to_mac(ip):
-    """ Convert an IP address to a MAC address by searching our DHCP config """
+    """
+    Convert an IP address to a MAC address by searching our DHCP config
+    """
     if ip == "":
         return "";
 
-    mac = run('grep -B 1 ' + ip + ' /etc/dhcpd.conf   | grep ethernet | sed -e \'s/.*net //\' -e \'s/;//\'')
+    mac = run('grep -B 1 %s /etc/dhcpd.conf | grep ethernet | sed -e \'s/.*net //\' -e \'s/;//\'' % ip)
     return mac
 
 @hosts(dhcp)
 def next_mac():
-    ''' Finds a MAC address that is not currently assigned to a VM '''
+    """
+    Finds a MAC address that is not currently assigned to a VM
+    """
     dhcp_macs = run('grep "hardware ethernet" /etc/dhcpd.conf | sed -e \'s/.*ethernet //\' -e \'s/;//\'')
-    assigned_macs = run('xe vif-list params=MAC | sed  -e \'/^$/d\' -e \'s/.*: //\'')
+    assigned_macs = run('xe vif-list params=MAC | sed -e \'/^$/d\' -e \'s/.*: //\'')
     return (list((set(dhcp_macs.split()) - set(assigned_macs.split())))[0])
 
 
