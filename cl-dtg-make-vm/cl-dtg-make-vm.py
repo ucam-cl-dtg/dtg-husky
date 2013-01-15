@@ -9,7 +9,6 @@ dom0 = 'husky0.dtg.cl.cam.ac.uk'
 env.user="root"
 
 # OS
-OS                = 'Ubuntu 12.04 server edition'
 TEMPLATE          = '66456203-e601-9bd7-2022-6f2158f375ac'
 INSTALLREPO       = 'http://www-uxsup.csx.cam.ac.uk/pub/linux/ubuntu'
 PRESEEDLOCATION   = 'http://puppy8.dtg.cl.cam.ac.uk/alloptions.cfg'
