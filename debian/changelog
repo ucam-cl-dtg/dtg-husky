@@ -1,0 +1,4 @@
+cl-dtg-make-vm (0.0.1) precise; urgency=low
+
+  * Initial release
+ -- Oliver Chick <oliver.chick@cl.cam.ac.uk>  Mon, 07 Jan 2013 13:05:01 +0000
