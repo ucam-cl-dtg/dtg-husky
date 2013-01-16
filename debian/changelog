@@ -1,3 +1,9 @@
+cl-dtg-make-vm (0.0.2) precise; urgency=low
+
+  * No functional change. Modification to build system so launchpad imports from github, and produces a package
+
+ -- Oliver Chick <oc243@cl.cam.ac.uk>  Wed, 16 Jan 2013 15:59:56 +0000
+
 cl-dtg-make-vm (0.0.1) precise; urgency=low
 
   * Initial release
