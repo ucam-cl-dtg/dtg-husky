@@ -1,3 +1,9 @@
+cl-dtg-make-vm (0.0.3) precise; urgency=low
+
+  * Modification to cl-dtg-make-vm to build VMs with two disks. xvda is used for storing the OS, and xvdb is used for storing /local/data.
+
+ -- Oliver Chick <oc243@cl.cam.ac.uk>  Thu, 24 Jan 2013 01:00:57 +0000
+
 cl-dtg-make-vm (0.0.2) precise; urgency=low
 
   * No functional change. Modification to build system so launchpad imports from github, and produces a package
