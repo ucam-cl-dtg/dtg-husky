@@ -1,3 +1,9 @@
+cl-dtg-make-vm (0.0.4) precise; urgency=low
+
+  * Now uses argparse to get options in a more conventional UNIX tools way. Run cl-dtg-make-vm -h for help.
+
+ -- Oliver Chick <oc243@cl.cam.ac.uk>  Sat, 02 Feb 2013 16:13:38 +0000
+
 cl-dtg-make-vm (0.0.3) precise; urgency=low
 
   * Modification to cl-dtg-make-vm to build VMs with two disks. xvda is used for storing the OS, and xvdb is used for storing /local/data.
