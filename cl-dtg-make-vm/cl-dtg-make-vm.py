@@ -1,7 +1,7 @@
 #! /usr/bin/python
 
 from fabric.api import *
-import sys, subprocess
+import sys, subprocess, argparse
 
 dhcp = 'husky0.dtg.cl.cam.ac.uk'
 dom0 = 'husky0.dtg.cl.cam.ac.uk'
@@ -93,7 +93,31 @@ def next_mac():
 
 if __name__ == '__main__':
 
-    if len(sys.argv) > 1:
-        subprocess.call(['fab', '-f', __file__] + sys.argv[1:])
-    else:
-        subprocess.call(['fab', '-f', __file__, '--list'])
+    parser = argparse.ArgumentParser(description='Make a VM on the DTG husky cluster. The resulting VM will, by the magic of drt24\'s puppet, contain much DTG goodness')
+
+    parser.add_argument('--new-template', action='store_true', help='Build a new template from the Ubuntu repos, and apply DTG customisations. The result is stored as a template, rather than creating a VM')
+
+    # We don't want both an IP address and MAC
+    ip_mac_group = parser.add_mutually_exclusive_group()
+    ip_mac_group.add_argument('-i', '--ip', help='The created VM will be given a MAC address that will be offered this value by DHCP')
+    ip_mac_group.add_argument('-M', '--mac', help='MAC address to assign the VM\s VIF')
+
+    # Optional args
+    parser.add_argument('-m', '--memory', type=int, help='memory (in GB) assigned to VM')
+    parser.add_argument('-v', '--vcpus', type=int, help='Number of VCPUs')
+    parser.add_argument('-r', '--rootfs', dest='root_fs_size', type=int, help='Size of /dev/xvda, the root filesystem')
+    parser.add_argument('-d', '--datafs', dest='data_size', type=int, help='Size of /dev/xvdb, the data partition, mounted on /data/local')
+    parser.add_argument('-l', '--dataloc', help='Storage repository to use for the data partition')
+
+    # Name is required
+    parser.add_argument('name', help='The hostname of the VM')
+
+    parsed_args = vars(parser.parse_args())
+    argstring = ""
+    for param in parsed_args.keys():
+        if parsed_args[param] != None and param != 'new_template':
+            argstring = '%s%s=%s,' % (argstring, param, parsed_args[param])
+
+    argstring = argstring[:-1]
+
+    subprocess.call(['fab', '-f', __file__] + ['new_vm:' + argstring])
