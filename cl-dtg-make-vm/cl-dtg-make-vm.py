@@ -152,7 +152,7 @@ if __name__ == '__main__':
     ip_mac_group.add_argument('-M', '--mac', help='MAC address to assign the VM\s VIF')
 
     # Optional args
-    parser.add_argument('-m', '--memory', type=int, help='memory (in GB) assigned to VM')
+    parser.add_argument('-m', '--memory', type=int, help='memory (in MB) assigned to VM')
     parser.add_argument('-v', '--vcpus', type=int, help='Number of VCPUs')
     parser.add_argument('-r', '--rootfs', dest='root_fs_size', type=int, help='Size of /dev/xvda, the root filesystem')
     parser.add_argument('-d', '--datafs', dest='data_size', type=int, help='Size of /dev/xvdb, the data partition, mounted on /data/local')
