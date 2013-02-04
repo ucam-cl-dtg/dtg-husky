@@ -1,3 +1,14 @@
+cl-dtg-make-vm (0.0.5) precise; urgency=low
+
+	* Now VMs are, by default, created from DTG-snapshot. This means
+	we can build a VM in twenty three (23) seconds.
+	* Currently, some of the magic is not working
+	correctly. Specifically, the tricks to automagically create new
+	templates fails, as dom0 cannot SSH into the guest, due to key
+	issues that will be fixed at a later date.
+
+ -- Oliver Chick <oc243@cl.cam.ac.uk>  Mon, 04 Feb 2013 11:17:54 +0000
+
 cl-dtg-make-vm (0.0.4) precise; urgency=low
 
   * Now uses argparse to get options in a more conventional UNIX tools way. Run cl-dtg-make-vm -h for help.
