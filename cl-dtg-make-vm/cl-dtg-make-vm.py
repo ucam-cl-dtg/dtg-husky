@@ -98,8 +98,9 @@ def new_cloned_vm(name, ip="", mac="", memory=DEFAULTMEMORY, vcpus=DEFAULTVCPUs,
     """
 
     # Create VM from snapshot
-    run('xe vm-install new-name-label=%s template=%s sr-uuid=%s' % (name, TEMPLATENAME, SR))
-    new_vm = run('xe vm-list name-label=%s params=uuid --minimal' % name)
+    run('xe vm-clone new-name-label=%s vm=%s' % (name, TEMPLATENAME))
+    new_vm = run('xe template-list name-label=%s params=uuid --minimal' % name)
+    run('xe template-param-set is-a-template=false uuid=%s' % new_vm)
 
     prepare_vm(ip, mac, new_vm, memory, vcpus)
 
