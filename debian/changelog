@@ -1,3 +1,11 @@
+cl-dtg-make-vm (0.0.6) precise; urgency=low
+
+  * Change the help associated with the memory command, so it correctly says that memory is specified in MB, not GB
+  * Loop until an IP address is found, then print it. This is much better than just waiting 10 seconds
+  * Hide the output of the script. Therefore all that we now have printed (if all goes well) is the IP address of the new machine. Therefore you easily do magic where stdout is piped into another command.
+
+ -- Oliver Chick <oc243@cl.cam.ac.uk>  Sat, 09 Feb 2013 14:23:07 +0000
+
 cl-dtg-make-vm (0.0.5-ubuntu1) precise; urgency=low
 
   * Now VMs are, by default, created from DTG-snapshot. This means we can build a VM in twenty three (23) seconds.
