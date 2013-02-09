@@ -36,6 +36,15 @@ TEMPLATENAME      = 'DTG-template'
 # SSH
 SSHUSER           = 'dtg'
 
+def validIP(address):
+    parts = address.split(".")
+    if len(parts) != 4:
+        return False
+    for item in parts:
+        if not 0 <= int(item) <= 255:
+            return False
+    return True
+
 def prepare_vm(ip, mac, uuid, memory, vcpus):
 
     if ip != "":
@@ -113,8 +122,10 @@ def new_cloned_vm(name, ip="", mac="", memory=DEFAULTMEMORY, vcpus=DEFAULTVCPUs,
 
     # SSH into the new machine, and set the hostname. First wait for the m/c to boot
 
-    sleep(10)
-    ip = run('xe vm-param-get param-name=networks uuid=%s | sed -e \'s_0/ip: __\' -e \'s/; .*$//\'' % new_vm)
+    while not validIP(ip):
+        ip = run('xe vm-param-get param-name=networks uuid=%s | sed -e \'s_0/ip: __\' -e \'s/; .*$//\'' % new_vm)
+        sleep(1)
+    print ip
     subprocess.call(['ssh %s@%s "hostname %s"'  % (SSHUSER, ip, name)])
     subprocess.call(['ssh %s@%s "./etc/puppet-bare/hooks/post-update"' % (SSHUSER, ip)])
 
@@ -152,7 +163,7 @@ if __name__ == '__main__':
     ip_mac_group.add_argument('-M', '--mac', help='MAC address to assign the VM\s VIF')
 
     # Optional args
-    parser.add_argument('-m', '--memory', type=int, help='memory (in GB) assigned to VM')
+    parser.add_argument('-m', '--memory', type=int, help='memory (in MB) assigned to VM')
     parser.add_argument('-v', '--vcpus', type=int, help='Number of VCPUs')
     parser.add_argument('-r', '--rootfs', dest='root_fs_size', type=int, help='Size of /dev/xvda, the root filesystem')
     parser.add_argument('-d', '--datafs', dest='data_size', type=int, help='Size of /dev/xvdb, the data partition, mounted on /data/local')
@@ -170,4 +181,4 @@ if __name__ == '__main__':
     argstring = argstring[:-1]
 
     command = 'new_vm' if parsed_args['new_template'] else 'new_cloned_vm'
-    subprocess.call(['fab', '-f', __file__] + [command + ':' + argstring])
+    subprocess.call(['fab', '--hide=output,running', '-f', __file__] + [command + ':' + argstring])
