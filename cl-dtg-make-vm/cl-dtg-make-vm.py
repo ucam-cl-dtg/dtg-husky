@@ -36,6 +36,15 @@ TEMPLATENAME      = 'DTG-template'
 # SSH
 SSHUSER           = 'dtg'
 
+def validIP(address):
+    parts = address.split(".")
+    if len(parts) != 4:
+        return False
+    for item in parts:
+        if not 0 <= int(item) <= 255:
+            return False
+    return True
+
 def prepare_vm(ip, mac, uuid, memory, vcpus):
 
     if ip != "":
@@ -113,8 +122,10 @@ def new_cloned_vm(name, ip="", mac="", memory=DEFAULTMEMORY, vcpus=DEFAULTVCPUs,
 
     # SSH into the new machine, and set the hostname. First wait for the m/c to boot
 
-    sleep(10)
-    ip = run('xe vm-param-get param-name=networks uuid=%s | sed -e \'s_0/ip: __\' -e \'s/; .*$//\'' % new_vm)
+    while not validIP(ip):
+        ip = run('xe vm-param-get param-name=networks uuid=%s | sed -e \'s_0/ip: __\' -e \'s/; .*$//\'' % new_vm)
+        sleep(1)
+    print ip
     subprocess.call(['ssh %s@%s "hostname %s"'  % (SSHUSER, ip, name)])
     subprocess.call(['ssh %s@%s "./etc/puppet-bare/hooks/post-update"' % (SSHUSER, ip)])
 
