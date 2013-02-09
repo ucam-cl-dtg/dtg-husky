@@ -181,4 +181,4 @@ if __name__ == '__main__':
     argstring = argstring[:-1]
 
     command = 'new_vm' if parsed_args['new_template'] else 'new_cloned_vm'
-    subprocess.call(['fab', '-f', __file__] + [command + ':' + argstring])
+    subprocess.call(['fab', '--hide=output,running', '-f', __file__] + [command + ':' + argstring])
