@@ -27,8 +27,8 @@ NETWORK           = '77922c07-8ea4-abb2-708b-4719f4c6a0f8'
 DEVICE            = '0'
 
 # System
-DEFAULTVCPUs      = '2'
-DEFAULTMEMORY     = '2048'
+DEFAULTVCPUs      = '1'
+DEFAULTMEMORY     = '512'
 
 # Template
 TEMPLATENAME      = 'DTG-template'
