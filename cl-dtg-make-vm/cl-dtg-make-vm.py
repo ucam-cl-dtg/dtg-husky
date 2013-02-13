@@ -4,7 +4,7 @@ from fabric.api import *
 import sys, subprocess, argparse
 from datetime import date
 from time import sleep
-import sys, subprocess
+import sys, subprocess, socket
 
 dhcp = 'husky0.dtg.cl.cam.ac.uk'
 dom0 = 'husky0.dtg.cl.cam.ac.uk'
@@ -126,7 +126,7 @@ def new_cloned_vm(name, ip="", mac="", memory=DEFAULTMEMORY, vcpus=DEFAULTVCPUs,
         ip = run('xe vm-param-get param-name=networks uuid=%s | sed -e \'s_0/ip: __\' -e \'s/; .*$//\'' % new_vm)
         sleep(1)
 
-    dns_name = subprocess.Popen(['host', '%s' % ip], stdout=subprocess.PIPE).communicate()[0].split(' ')[-1].rsplit()[0][:-1]
+    dns_name = socket.gethostbyaddr(ip)[0]
     print dns_name
 
     with settings(warn_only=True):
