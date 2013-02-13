@@ -125,9 +125,14 @@ def new_cloned_vm(name, ip="", mac="", memory=DEFAULTMEMORY, vcpus=DEFAULTVCPUs,
     while not validIP(ip):
         ip = run('xe vm-param-get param-name=networks uuid=%s | sed -e \'s_0/ip: __\' -e \'s/; .*$//\'' % new_vm)
         sleep(1)
-    print ip
-    subprocess.call(['ssh %s@%s "hostname %s"'  % (SSHUSER, ip, name)])
-    subprocess.call(['ssh %s@%s "./etc/puppet-bare/hooks/post-update"' % (SSHUSER, ip)])
+
+    dns_name = subprocess.Popen(['host', '%s' % ip], stdout=subprocess.PIPE).communicate()[0].split(' ')[-1].rsplit()[0][:-1]
+    print dns_name
+
+    with settings(warn_only=True):
+        while run('ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  %s@%s "sudo sh -c \'echo %s > /etc/hostname ; sudo start hostname\'"'  % (SSHUSER, dns_name, name)) == '1':
+            sleep(1)
+    run('nohup ssh -n -f -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no %s@%s "nohup sudo bash /etc/puppet-bare/hooks/post-update"' % (SSHUSER, dns_name))
 
 
 @hosts(dhcp)
