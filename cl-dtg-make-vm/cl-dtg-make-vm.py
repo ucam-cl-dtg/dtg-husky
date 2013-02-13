@@ -1,10 +1,9 @@
 #! /usr/bin/python
 
 from fabric.api import *
-import sys, subprocess, argparse
+import sys, argparse, subprocess, socket
 from datetime import date
 from time import sleep
-import sys, subprocess
 
 dhcp = 'husky0.dtg.cl.cam.ac.uk'
 dom0 = 'husky0.dtg.cl.cam.ac.uk'
@@ -27,8 +26,8 @@ NETWORK           = '77922c07-8ea4-abb2-708b-4719f4c6a0f8'
 DEVICE            = '0'
 
 # System
-DEFAULTVCPUs      = '2'
-DEFAULTMEMORY     = '2048'
+DEFAULTVCPUs      = '1'
+DEFAULTMEMORY     = '512'
 
 # Template
 TEMPLATENAME      = 'DTG-template'
@@ -56,8 +55,8 @@ def prepare_vm(ip, mac, uuid, memory, vcpus):
     run('xe vif-create network-uuid=%s mac=%s vm-uuid=%s device=%s' % (NETWORK, mac, uuid, DEVICE))
 
     # Give the VM enough memory, and VCPU
-    run('xe vm-param-set uuid=%s VCPUs-max=%s' % (uuid, vcpus))
     run('xe vm-param-set uuid=%s  VCPUs-at-startup=%s'  % (uuid,vcpus))
+    run('xe vm-param-set uuid=%s VCPUs-max=%s' % (uuid, vcpus))
     run('xe vm-memory-limits-set uuid=%s dynamic-max=%sMiB static-max=%sMiB static-min=%sMiB dynamic-min=%sMiB' % (uuid, memory, memory, memory, memory))
 
 
@@ -125,9 +124,14 @@ def new_cloned_vm(name, ip="", mac="", memory=DEFAULTMEMORY, vcpus=DEFAULTVCPUs,
     while not validIP(ip):
         ip = run('xe vm-param-get param-name=networks uuid=%s | sed -e \'s_0/ip: __\' -e \'s/; .*$//\'' % new_vm)
         sleep(1)
-    print ip
-    subprocess.call(['ssh %s@%s "hostname %s"'  % (SSHUSER, ip, name)])
-    subprocess.call(['ssh %s@%s "./etc/puppet-bare/hooks/post-update"' % (SSHUSER, ip)])
+
+    dns_name = socket.gethostbyaddr(ip)[0]
+    print dns_name
+
+    with settings(warn_only=True):
+        while run('ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  %s@%s "sudo sh -c \'echo %s > /etc/hostname ; sudo start hostname\'"'  % (SSHUSER, dns_name, name)) == '1':
+            sleep(1)
+    run('nohup ssh -n -f -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no %s@%s "nohup sudo bash /etc/puppet-bare/hooks/post-update"' % (SSHUSER, dns_name))
 
 
 @hosts(dhcp)
