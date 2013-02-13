@@ -1,3 +1,13 @@
+cl-dtg-make-vm (0.0.7) precise; urgency=low
+
+  * Changed the default VM config, so by default, VMs now have 1 VCPU and 512MB of RAM. These can easily be overriden - see -h for information.
+  * Fixed bug that made the script die when a VM is built using 1 VCPU
+  * Added magic for SSHing to VMs, setting the hostname and forcing a puppet update, so that you get any config that is dependent on hostname
+  * Use socket.gethostbyaddr, rather than shelling out. This is much nicer. WHy didn't I do this before?
+  * Tidy up of imports, including removing some duplicates
+
+ -- Oliver Chick <oc243@cl.cam.ac.uk>  Wed, 13 Feb 2013 11:15:46 +0000
+
 cl-dtg-make-vm (0.0.6) precise; urgency=low
 
   * Change the help associated with the memory command, so it correctly says that memory is specified in MB, not GB
