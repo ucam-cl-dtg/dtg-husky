@@ -1,10 +1,9 @@
 #! /usr/bin/python
 
 from fabric.api import *
-import sys, subprocess, argparse
+import sys, argparse, subprocess, socket
 from datetime import date
 from time import sleep
-import sys, subprocess, socket
 
 dhcp = 'husky0.dtg.cl.cam.ac.uk'
 dom0 = 'husky0.dtg.cl.cam.ac.uk'
