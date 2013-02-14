@@ -33,7 +33,7 @@ DEFAULTMEMORY     = '512'
 TEMPLATENAME      = 'DTG-template'
 
 # SSH
-SSHUSER           = 'dtg'
+SSHUSER           = 'root'
 
 def validIP(address):
     parts = address.split(".")
