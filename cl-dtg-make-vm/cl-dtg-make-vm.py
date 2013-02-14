@@ -16,7 +16,7 @@ INSTALLREPO       = 'http://www-uxsup.csx.cam.ac.uk/pub/linux/ubuntu'
 PRESEEDLOCATION   = 'http://git.dtg.cl.cam.ac.uk/?p=husky/preseed.git;a=blob_plain;f=puppy-preseed.cfg;hb=HEAD'
 
 # Filesystem
-DEFAULTROOTFSSIZE = '4'
+DEFAULTROOTFSSIZE = '8'
 DEFAULTDATAFSSIZE = '1'
 DEFAULTSR         = 'NFS\ virtual\ disk\ storage'
 SR                = 'b1bb7fa6-ca99-c984-4002-940ac6757e3e'
