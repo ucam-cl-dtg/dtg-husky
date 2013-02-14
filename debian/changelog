@@ -1,3 +1,9 @@
+cl-dtg-make-vm (0.0.9) precise; urgency=low
+
+  * Fetch latest puppet config from gitlab before running puppet on new VMs
+
+ -- Oliver Chick <oc243@cl.cam.ac.uk>  Thu, 14 Feb 2013 14:53:55 +0000
+
 cl-dtg-make-vm (0.0.8) precise; urgency=high
 
   * Changed location of preseed file to be on git.dtg, we can therefore remove stuff from the dhcp puppet config
