@@ -1,3 +1,11 @@
+cl-dtg-make-vm (0.0.10) precise; urgency=low
+
+  * Change VCPUs-max befoe VCPUss-at-startup
+  * Change root FS size to 8GB. 4GB is proving to be too small
+  * Use root account, not dtg for SSHing into to change the hostname
+
+ -- Oliver Chick <oc243@cl.cam.ac.uk>  Fri, 15 Feb 2013 13:07:18 +0000
+
 cl-dtg-make-vm (0.0.9) precise; urgency=low
 
   * Fetch latest puppet config from gitlab before running puppet on new VMs
