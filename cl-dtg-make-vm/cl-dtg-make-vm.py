@@ -16,7 +16,7 @@ INSTALLREPO       = 'http://www-uxsup.csx.cam.ac.uk/pub/linux/ubuntu'
 PRESEEDLOCATION   = 'http://git.dtg.cl.cam.ac.uk/?p=husky/preseed.git;a=blob_plain;f=puppy-preseed.cfg;hb=HEAD'
 
 # Filesystem
-DEFAULTROOTFSSIZE = '4'
+DEFAULTROOTFSSIZE = '8'
 DEFAULTDATAFSSIZE = '1'
 DEFAULTSR         = 'NFS\ virtual\ disk\ storage'
 SR                = 'b1bb7fa6-ca99-c984-4002-940ac6757e3e'
@@ -33,7 +33,7 @@ DEFAULTMEMORY     = '512'
 TEMPLATENAME      = 'DTG-template'
 
 # SSH
-SSHUSER           = 'dtg'
+SSHUSER           = 'root'
 
 def validIP(address):
     parts = address.split(".")
@@ -55,8 +55,9 @@ def prepare_vm(ip, mac, uuid, memory, vcpus):
     run('xe vif-create network-uuid=%s mac=%s vm-uuid=%s device=%s' % (NETWORK, mac, uuid, DEVICE))
 
     # Give the VM enough memory, and VCPU
-    run('xe vm-param-set uuid=%s  VCPUs-at-startup=%s'  % (uuid,vcpus))
     run('xe vm-param-set uuid=%s VCPUs-max=%s' % (uuid, vcpus))
+    run('xe vm-param-set uuid=%s  VCPUs-at-startup=%s'  % (uuid,vcpus))
+
     run('xe vm-memory-limits-set uuid=%s dynamic-max=%sMiB static-max=%sMiB static-min=%sMiB dynamic-min=%sMiB' % (uuid, memory, memory, memory, memory))
 
 
