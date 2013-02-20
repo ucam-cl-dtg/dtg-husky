@@ -1,4 +1,0 @@
-B1;3201;0c#!/usr/bin/make -f
-
-%:
-	dh $@ --with python2
