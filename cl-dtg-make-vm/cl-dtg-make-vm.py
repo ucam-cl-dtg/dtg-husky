@@ -45,7 +45,9 @@ def validIP(address):
     return True
 
 def prepare_vm(ip, mac, uuid, memory, vcpus):
-
+    """
+    Assigns a mac address, memory and vcpus to a VM
+    """
     if ip != "":
         mac = ip_to_mac(ip)
     if mac == "":
