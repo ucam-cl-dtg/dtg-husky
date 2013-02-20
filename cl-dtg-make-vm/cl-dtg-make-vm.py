@@ -46,7 +46,7 @@ def validIP(address):
 
 def prepare_vm(ip, mac, uuid, memory, vcpus):
     """
-    Assigns a mac address, memory and vcpus to a VM
+    Assigns a mac address, memory and vcpus to a VM.
     """
     if ip != "":
         mac = ip_to_mac(ip)
@@ -66,7 +66,7 @@ def prepare_vm(ip, mac, uuid, memory, vcpus):
 @hosts(dom0)
 def new_vm(name="", ip="", mac="", memory=DEFAULTMEMORY, vcpus=DEFAULTVCPUs, root_fs_size=DEFAULTROOTFSSIZE, fs_location=SR):
     """
-    Create a new VM
+    Create a new VM.
     """
     if name == "":
         name='DTG-snapshot-' + date.today()
@@ -140,7 +140,7 @@ def new_cloned_vm(name, ip="", mac="", memory=DEFAULTMEMORY, vcpus=DEFAULTVCPUs,
 @hosts(dhcp)
 def ip_to_mac(ip):
     """
-    Convert an IP address to a MAC address by searching our DHCP config
+    Convert an IP address to a MAC address by searching our DHCP config.
     """
     if ip == "":
         return "";
@@ -151,7 +151,7 @@ def ip_to_mac(ip):
 @hosts(dhcp)
 def next_mac():
     """
-    Finds a MAC address that is not currently assigned to a VM
+    Finds a MAC address that is not currently assigned to a VM.
     """
     dhcp_macs = run('grep "hardware ethernet" /etc/dhcpd.conf | sed -e \'s/.*ethernet //\' -e \'s/;//\'')
     assigned_macs = run('xe vif-list params=MAC | sed -e \'/^$/d\' -e \'s/.*: //\'')
