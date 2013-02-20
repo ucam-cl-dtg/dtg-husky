@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#! /usr/bin/env python2.7
 
 from fabric.api import *
 import sys, argparse, subprocess, socket
