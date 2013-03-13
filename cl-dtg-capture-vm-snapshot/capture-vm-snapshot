@@ -1,0 +1,52 @@
+#! /bin/bash
+
+set -e
+
+vm=$1
+vm_uuid="$(xe vm-list name-label=$vm params=uuid --minimal)"
+ip="$(xe vm-param-get param-name=networks uuid=$vm_uuid | sed -e 's_0/ip: __' -e 's/; .*$//')"
+echo $ip
+user="dtg"
+
+if [ $# -lt 1 ]; then
+    echo "Usage: capture-vm-snapshot name"
+    exit 1
+fi
+
+noVMsSameName="$(xe vm-list name-label=$vm --minimal | wc -l)"
+
+if [ $noVMsSameName -ne 1 ]; then
+    echo "Ambiguous, or non-existent VM: $vm"
+    exit 1
+fi
+
+if [ 1 -lt 0 ]; then
+
+while [ ! $(ssh -o StrictHostKeyChecking=no ${user}@${ip} <<ESSH
+  while [ $(pgrep puppet) ] && [ ! -d /etc/puppet ]; do
+    sleep 2
+  done
+ESSH
+) ]; do
+    sleep 5
+done
+fi
+
+echo "SSH-ed into VM, and detected a valid puppet setup. Proceeding."
+echo "Shutting down"
+
+xe vm-shutdown name-label=$vm
+# wait until we have shutdown
+while [ $( xe vm-list params=power-state name-label=$vm | grep running ) ]; do
+    sleep 1
+done
+
+
+vif_uuid=$(xe vif-list vm-name-label=$vm --minimal)
+if [ -n "$vif_uuid" ]; then
+    echo "Destroying VIF"
+    xe vif-destroy uuid=$vif_uuid
+fi
+
+xe template-param-set is-a-template=true uuid=$vm_uuid
+xe template-param-set other-config:install-methods=http,ftp,nfs uuid=$vm_uuid
