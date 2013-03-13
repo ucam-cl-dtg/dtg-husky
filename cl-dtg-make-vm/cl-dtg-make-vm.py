@@ -64,12 +64,10 @@ def prepare_vm(ip, mac, uuid, memory, vcpus):
 
 
 @hosts(dom0)
-def new_vm(name="", ip="", mac="", memory=DEFAULTMEMORY, vcpus=DEFAULTVCPUs, root_fs_size=DEFAULTROOTFSSIZE, fs_location=SR):
+def new_vm(name, ip="", mac="", memory=DEFAULTMEMORY, vcpus=DEFAULTVCPUs, root_fs_size=DEFAULTROOTFSSIZE, fs_location=SR):
     """
     Create a new VM.
     """
-    if name == "":
-        name='DTG-snapshot-' + date.today()
 
     # Create a VM
     new_vm = run('xe vm-install new-name-label=%s template=%s sr-uuid=%s' % (name, TEMPLATE, fs_location))
