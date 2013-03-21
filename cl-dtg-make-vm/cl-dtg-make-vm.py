@@ -27,7 +27,8 @@ DEVICE            = '0'
 
 # System
 DEFAULTVCPUs      = '1'
-DEFAULTMEMORY     = '512'
+DEFAULTMINMEMORY  = '256'
+DEFAULTMAXMEMORY  = '512'
 
 # Template
 TEMPLATENAME      = 'DTG-template'
@@ -60,11 +61,11 @@ def prepare_vm(ip, mac, uuid, memory, vcpus):
     run('xe vm-param-set uuid=%s VCPUs-max=%s' % (uuid, vcpus))
     run('xe vm-param-set uuid=%s  VCPUs-at-startup=%s'  % (uuid,vcpus))
 
-    run('xe vm-memory-limits-set uuid=%s dynamic-max=%sMiB static-max=%sMiB static-min=%sMiB dynamic-min=%sMiB' % (uuid, memory, memory, memory, memory))
+    run('xe vm-memory-limits-set uuid=%s dynamic-max=%sMiB static-max=%sMiB static-min=%sMiB dynamic-min=%sMiB' % (uuid, memory, memory, DEFAULTMINMEMORY, DEFAULTMINMEMORY))
 
 
 @hosts(dom0)
-def new_vm(name, ip="", mac="", memory=DEFAULTMEMORY, vcpus=DEFAULTVCPUs, root_fs_size=DEFAULTROOTFSSIZE, fs_location=SR):
+def new_vm(name, ip="", mac="", memory=DEFAULTMAXMEMORY, vcpus=DEFAULTVCPUs, root_fs_size=DEFAULTROOTFSSIZE, fs_location=SR):
     """
     Create a new VM.
     """
@@ -99,7 +100,7 @@ def new_vm(name, ip="", mac="", memory=DEFAULTMEMORY, vcpus=DEFAULTVCPUs, root_f
 
 
 @hosts(dom0)
-def new_cloned_vm(name, ip="", mac="", memory=DEFAULTMEMORY, vcpus=DEFAULTVCPUs, data_size=DEFAULTDATAFSSIZE, data_SR=SR):
+def new_cloned_vm(name, ip="", mac="", memory=DEFAULTMAXMEMORY, vcpus=DEFAULTVCPUs, data_size=DEFAULTDATAFSSIZE, data_SR=SR):
     """
     Build a new VM by cloning the most recent DTG-snapshot.
     This will give a DTG-itised VM, much faster than calling new_vm,
