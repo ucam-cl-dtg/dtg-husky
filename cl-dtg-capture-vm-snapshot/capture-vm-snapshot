@@ -13,9 +13,9 @@ if [ $# -lt 1 ]; then
     exit 1
 fi
 
-noVMsSameName="$(xe vm-list name-label=$vm --minimal | wc -l)"
+no_vms_same_name="$(xe vm-list name-label=$vm --minimal | wc -l)"
 
-if [ $noVMsSameName -ne 1 ]; then
+if [ $no_vms_same_name -ne 1 ]; then
     echo "Ambiguous, or non-existent VM: $vm"
     exit 1
 fi
