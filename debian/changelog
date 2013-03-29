@@ -1,3 +1,32 @@
+cl-dtg-make-vm (0.0.11) precise; urgency=low
+
+  [ Mattias Linnap ]
+  * Move to DMZ script
+
+  [ Oliver Chick ]
+  * Remove the packaging stuff from the upstream branch. It should never have been there. Added in dd67085cd1555338c7d09809dcdf43e822819d17 by mistake
+
+  [ Thomas Bytheway ]
+  * Updated script shebang line to use /usr/bin/env rather than direct interpreter reference.
+
+  [ Oliver Chick ]
+  * Delete me
+  * Added documentation to the prepare_vm method
+  * added missing fullstops to comments
+  * Removed the default name of "" from new_vm, and the test for this value being "".
+  * Run the vm-boot script after changing the hostname. This will fix /etc/hosts
+  * Reduced the value of {static,dynamic} minimum memory to be 256MiB.
+
+ -- Oliver Chick <oc243@cl.cam.ac.uk>  Fri, 29 Mar 2013 11:24:53 +0000
+
+cl-dtg-make-vm (0.0.10) precise; urgency=low
+
+  * Change VCPUs-max befoe VCPUss-at-startup
+  * Change root FS size to 8GB. 4GB is proving to be too small
+  * Use root account, not dtg for SSHing into to change the hostname
+
+ -- Oliver Chick <oc243@cl.cam.ac.uk>  Fri, 15 Feb 2013 13:07:18 +0000
+
 cl-dtg-make-vm (0.0.9) precise; urgency=low
 
   * Fetch latest puppet config from gitlab before running puppet on new VMs
