@@ -8,9 +8,6 @@ if [ $# -lt 1 ]; then
 fi
 
 vm=$1
-vm_uuid="$(xe vm-list name-label=$vm params=uuid --minimal)"
-ip="$(xe vm-param-get param-name=networks uuid=$vm_uuid | sed -e 's_0/ip: __' -e 's/; .*$//')"
-user="dtg"
 
 no_vms_same_name="$(xe vm-list name-label=$vm --minimal | wc -l)"
 
@@ -18,6 +15,10 @@ if [ $no_vms_same_name -ne 1 ]; then
     echo "Ambiguous, or non-existent VM: $vm"
     exit 1
 fi
+
+vm_uuid="$(xe vm-list name-label=$vm params=uuid --minimal)"
+ip="$(xe vm-param-get param-name=networks uuid=$vm_uuid | sed -e 's_0/ip: __' -e 's/; .*$//')"
+user="dtg"
 
 if [ 1 -lt 0 ]; then
 
