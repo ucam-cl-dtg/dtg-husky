@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#! /usr/bin/env python2.7
 
 from fabric.api import *
 import sys, argparse, subprocess, socket
@@ -27,7 +27,8 @@ DEVICE            = '0'
 
 # System
 DEFAULTVCPUs      = '1'
-DEFAULTMEMORY     = '512'
+DEFAULTMINMEMORY  = '256'
+DEFAULTMAXMEMORY  = '512'
 
 # Template
 TEMPLATENAME      = 'DTG-template'
@@ -45,7 +46,9 @@ def validIP(address):
     return True
 
 def prepare_vm(ip, mac, uuid, memory, vcpus):
-
+    """
+    Assigns a mac address, memory and vcpus to a VM.
+    """
     if ip != "":
         mac = ip_to_mac(ip)
     if mac == "":
@@ -58,16 +61,14 @@ def prepare_vm(ip, mac, uuid, memory, vcpus):
     run('xe vm-param-set uuid=%s VCPUs-max=%s' % (uuid, vcpus))
     run('xe vm-param-set uuid=%s  VCPUs-at-startup=%s'  % (uuid,vcpus))
 
-    run('xe vm-memory-limits-set uuid=%s dynamic-max=%sMiB static-max=%sMiB static-min=%sMiB dynamic-min=%sMiB' % (uuid, memory, memory, memory, memory))
+    run('xe vm-memory-limits-set uuid=%s dynamic-max=%sMiB static-max=%sMiB static-min=%sMiB dynamic-min=%sMiB' % (uuid, memory, memory, DEFAULTMINMEMORY, DEFAULTMINMEMORY))
 
 
 @hosts(dom0)
-def new_vm(name="", ip="", mac="", memory=DEFAULTMEMORY, vcpus=DEFAULTVCPUs, root_fs_size=DEFAULTROOTFSSIZE, fs_location=SR):
+def new_vm(name, ip="", mac="", memory=DEFAULTMAXMEMORY, vcpus=DEFAULTVCPUs, root_fs_size=DEFAULTROOTFSSIZE, fs_location=SR):
     """
-    Create a new VM
+    Create a new VM.
     """
-    if name == "":
-        name='DTG-snapshot-' + date.today()
 
     # Create a VM
     new_vm = run('xe vm-install new-name-label=%s template=%s sr-uuid=%s' % (name, TEMPLATE, fs_location))
@@ -99,7 +100,7 @@ def new_vm(name="", ip="", mac="", memory=DEFAULTMEMORY, vcpus=DEFAULTVCPUs, roo
 
 
 @hosts(dom0)
-def new_cloned_vm(name, ip="", mac="", memory=DEFAULTMEMORY, vcpus=DEFAULTVCPUs, data_size=DEFAULTDATAFSSIZE, data_SR=SR):
+def new_cloned_vm(name, ip="", mac="", memory=DEFAULTMAXMEMORY, vcpus=DEFAULTVCPUs, data_size=DEFAULTDATAFSSIZE, data_SR=SR):
     """
     Build a new VM by cloning the most recent DTG-snapshot.
     This will give a DTG-itised VM, much faster than calling new_vm,
@@ -130,7 +131,7 @@ def new_cloned_vm(name, ip="", mac="", memory=DEFAULTMEMORY, vcpus=DEFAULTVCPUs,
     print dns_name
 
     with settings(warn_only=True):
-        while run('ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  %s@%s "sudo sh -c \'echo %s > /etc/hostname ; sudo start hostname\'"'  % (SSHUSER, dns_name, name)) == '1':
+        while run('ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  %s@%s "sudo sh -c \'echo %s > /etc/hostname ; sudo start hostname ; /etc/rc2.d/S76vm-boot \'"'  % (SSHUSER, dns_name, name)) == '1':
             sleep(1)
     run('nohup ssh -n -f -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no %s@%s "cd /etc/puppet-bare; sudo git fetch -f git://github.com/ucam-cl-dtg/dtg-puppet.git master:master; nohup sudo bash /etc/puppet-bare/hooks/post-update"' % (SSHUSER, dns_name))
 
@@ -138,7 +139,7 @@ def new_cloned_vm(name, ip="", mac="", memory=DEFAULTMEMORY, vcpus=DEFAULTVCPUs,
 @hosts(dhcp)
 def ip_to_mac(ip):
     """
-    Convert an IP address to a MAC address by searching our DHCP config
+    Convert an IP address to a MAC address by searching our DHCP config.
     """
     if ip == "":
         return "";
@@ -149,7 +150,7 @@ def ip_to_mac(ip):
 @hosts(dhcp)
 def next_mac():
     """
-    Finds a MAC address that is not currently assigned to a VM
+    Finds a MAC address that is not currently assigned to a VM.
     """
     dhcp_macs = run('grep "hardware ethernet" /etc/dhcpd.conf | sed -e \'s/.*ethernet //\' -e \'s/;//\'')
     assigned_macs = run('xe vif-list params=MAC | sed -e \'/^$/d\' -e \'s/.*: //\'')
