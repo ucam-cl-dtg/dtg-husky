@@ -5,7 +5,7 @@ import argparse, subprocess
 
 dom0 = 'husky0.dtg.cl.cam.ac.uk'
 
-env.user="root"
+env.user = "root"
 
 @hosts(dom0)
 def rm_vm(name):
