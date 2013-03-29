@@ -1,9 +1,7 @@
 #! /usr/bin/env python2.7
 
 from fabric.api import *
-import sys, argparse, subprocess, socket
-from datetime import date
-from time import sleep
+import argparse, subprocess
 
 dom0 = 'husky0.dtg.cl.cam.ac.uk'
 
