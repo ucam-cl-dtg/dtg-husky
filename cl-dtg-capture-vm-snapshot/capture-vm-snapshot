@@ -2,15 +2,15 @@
 
 set -e
 
-vm=$1
-vm_uuid="$(xe vm-list name-label=$vm params=uuid --minimal)"
-ip="$(xe vm-param-get param-name=networks uuid=$vm_uuid | sed -e 's_0/ip: __' -e 's/; .*$//')"
-user="dtg"
-
 if [ $# -lt 1 ]; then
     echo "Usage: capture-vm-snapshot name"
     exit 1
 fi
+
+vm=$1
+vm_uuid="$(xe vm-list name-label=$vm params=uuid --minimal)"
+ip="$(xe vm-param-get param-name=networks uuid=$vm_uuid | sed -e 's_0/ip: __' -e 's/; .*$//')"
+user="dtg"
 
 no_vms_same_name="$(xe vm-list name-label=$vm --minimal | wc -l)"
 
