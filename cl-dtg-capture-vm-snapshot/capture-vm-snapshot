@@ -2,6 +2,8 @@
 
 set -e
 
+user="dtg"
+
 if [ $# -lt 1 ]; then
     echo "Usage: capture-vm-snapshot name"
     exit 1
@@ -18,19 +20,15 @@ fi
 
 vm_uuid="$(xe vm-list name-label=$vm params=uuid --minimal)"
 ip="$(xe vm-param-get param-name=networks uuid=$vm_uuid | sed -e 's_0/ip: __' -e 's/; .*$//')"
-user="dtg"
-
-if [ 1 -lt 0 ]; then
 
 while [ ! $(ssh -o StrictHostKeyChecking=no ${user}@${ip} <<ESSH
-  while [ $(pgrep puppet) ] && [ ! -d /etc/puppet ]; do
+  while [ $(pgrep puppet) ] || [ ! -d /etc/puppet ]; do
     sleep 2
   done
 ESSH
 ) ]; do
     sleep 5
 done
-fi
 
 echo "SSH-ed into VM, and detected a valid puppet setup. Proceeding."
 echo "Shutting down"
