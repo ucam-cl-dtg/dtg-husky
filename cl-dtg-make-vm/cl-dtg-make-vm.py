@@ -130,6 +130,8 @@ def new_cloned_vm(name, ip="", mac="", memory=DEFAULTMAXMEMORY, vcpus=DEFAULTVCP
     dns_name = socket.gethostbyaddr(ip)[0]
     print dns_name
 
+    run('xe vm-param-set name-description=%s uuid=%s' % (dns_name, new_vm))
+
     with settings(warn_only=True):
         while run('ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  %s@%s "sudo sh -c \'echo %s > /etc/hostname ; sudo start hostname ; /etc/rc2.d/S76vm-boot \'"'  % (SSHUSER, dns_name, name)) == '1':
             sleep(1)
