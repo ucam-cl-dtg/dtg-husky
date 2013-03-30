@@ -46,7 +46,7 @@ def validIP(address):
     return True
 
 def check_name(name):
-    duplicate_name  = int(run('xe vm-list name-label=%s | wc -l' % name)) > 0
+    duplicate_name = run('xe vm-list name-label=%s' % name).strip()
     if duplicate_name:
         sys.stderr.write('Duplicate VM name: %s. You might wish to use cl-dtg-rm-vm.' % name)
         sys.exit(1)
