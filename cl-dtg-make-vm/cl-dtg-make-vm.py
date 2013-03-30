@@ -1,7 +1,7 @@
 #! /usr/bin/env python2.7
 
 from fabric.api import *
-import sys, argparse, subprocess, socket
+import sys, argparse, subprocess, socket, getpass
 from datetime import date
 from time import sleep
 
@@ -130,7 +130,7 @@ def new_cloned_vm(name, ip="", mac="", memory=DEFAULTMAXMEMORY, vcpus=DEFAULTVCP
     dns_name = socket.gethostbyaddr(ip)[0]
     print dns_name
 
-    run('xe vm-param-set name-description=%s uuid=%s' % (dns_name, new_vm))
+    run('xe vm-param-set name-description="%s - %s" uuid=%s' % (dns_name, getpass.getuser(), new_vm))
 
     with settings(warn_only=True):
         while run('ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  %s@%s "sudo sh -c \'echo %s > /etc/hostname ; sudo start hostname ; /etc/rc2.d/S76vm-boot \'"'  % (SSHUSER, dns_name, name)) == '1':
