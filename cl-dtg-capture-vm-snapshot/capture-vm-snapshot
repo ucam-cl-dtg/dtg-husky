@@ -2,7 +2,7 @@
 
 set -e
 
-user="dtg"
+user="root"
 
 if [ $# -lt 1 ]; then
     echo "Usage: capture-vm-snapshot name"
