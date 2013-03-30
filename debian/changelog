@@ -1,3 +1,16 @@
+cl-dtg-make-vm (0.0.12) precise; urgency=low
+
+  [ Andrew Rice ]
+  * Redirected the output of the puppet configuration to /vat/log/puppet/installlog
+  * Changed log file name to be a bit more sane
+  * Initial checkin of a script to remove a VM and delete its disks
+  * Removed unused imports
+  * Style: Fixed whitespace around equals-sign
+
+  [ Oliver Chick ]
+
+ -- Oliver Chick <oc243@cl.cam.ac.uk>  Sat, 30 Mar 2013 12:19:55 +0000
+
 cl-dtg-make-vm (0.0.11) precise; urgency=low
 
   [ Mattias Linnap ]
