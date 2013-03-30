@@ -12,6 +12,7 @@ Package: cl-dtg-make-vm
 Architecture: all
 Section: python
 Depends: fabric
-Description: script to create a puppy on the DTG Husky cluster
- Script to create a VM on the DTG Husky cluster without going through GUIs,
- and mounting virtual CDs.
+Description: Scripts for doing magic with VMs in the DTG husky cluster:
+ -A script to create a puppy
+ -A script to put live puppies in the DMZ
+ -A script to kill puppies
