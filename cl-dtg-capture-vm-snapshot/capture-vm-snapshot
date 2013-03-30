@@ -19,12 +19,14 @@ fi
 vm_uuid="$(xe vm-list name-label=$vm params=uuid --minimal)"
 ip="$(xe vm-param-get param-name=networks uuid=$vm_uuid | sed -e 's_0/ip: __' -e 's/; .*$//')"
 
-while [ ! $(ssh -o StrictHostKeyChecking=no ${user}@${ip} <<ESSH
-  while [ $(pgrep puppet) ] || [ ! -d /etc/puppet ]; do
-    sleep 2
-  done
+RET=1
+until [ $RET -eq 0 ]; do
+    ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=7200 -o PreferredAuthentications=publickey ${user}@${ip} <<ESSH
+	  while [ $(pgrep puppet) ] || [ ! -d /etc/puppet ]; do
+	    sleep 2
+	  done
 ESSH
-) ]; do
+    RET=$?
     sleep 5
 done
 
