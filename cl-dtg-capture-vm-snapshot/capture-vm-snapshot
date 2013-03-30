@@ -1,7 +1,5 @@
 #! /bin/bash
 
-set -e
-
 user="root"
 
 if [ $# -lt 1 ]; then
