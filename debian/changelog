@@ -1,3 +1,9 @@
+cl-dtg-make-vm (0.0.12) precise; urgency=high
+
+  * Fix bug in installer that wrote to /usr.bin
+
+ -- Oliver Chick <oc243@cl.cam.ac.uk>  Tue, 02 Apr 2013 01:28:29 +0100
+
 cl-dtg-make-vm (0.0.12) precise; urgency=low
 
   [ Andrew Rice ]
