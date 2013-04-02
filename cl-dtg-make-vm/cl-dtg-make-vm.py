@@ -45,6 +45,12 @@ def validIP(address):
             return False
     return True
 
+def check_name(name):
+    duplicate_name = run('xe vm-list name-label=%s' % name).strip()
+    if duplicate_name:
+        sys.stderr.write('Duplicate VM name: %s. You might wish to use cl-dtg-rm-vm.' % name)
+        sys.exit(1)
+
 def prepare_vm(ip, mac, uuid, memory, vcpus):
     """
     Assigns a mac address, memory and vcpus to a VM.
@@ -69,6 +75,8 @@ def new_vm(name, ip="", mac="", memory=DEFAULTMAXMEMORY, vcpus=DEFAULTVCPUs, roo
     """
     Create a new VM.
     """
+
+    check_name(name)
 
     # Create a VM
     new_vm = run('xe vm-install new-name-label=%s template=%s sr-uuid=%s' % (name, TEMPLATE, fs_location))
@@ -106,6 +114,8 @@ def new_cloned_vm(name, ip="", mac="", memory=DEFAULTMAXMEMORY, vcpus=DEFAULTVCP
     This will give a DTG-itised VM, much faster than calling new_vm,
     however the VM uses copy-on-write.
     """
+
+    check_name(name)
 
     # Create VM from snapshot
     run('xe vm-clone new-name-label=%s vm=%s' % (name, TEMPLATENAME))
