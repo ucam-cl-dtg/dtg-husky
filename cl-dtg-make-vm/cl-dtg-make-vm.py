@@ -140,7 +140,8 @@ def new_cloned_vm(name, ip="", mac="", memory=DEFAULTMAXMEMORY, vcpus=DEFAULTVCP
     dns_name = socket.gethostbyaddr(ip)[0]
     print dns_name
 
-    run('xe vm-param-set name-description="%s - %s" uuid=%s' % (dns_name, getpass.getuser(), new_vm))
+    run('xe vm-param-set name-description="%s" uuid=%s' % (dns_name, new_vm))
+    run('xe vm-param-set other-config:XenCenter.CustomFields.owner="%s" uuid=%s' % (getpass.getuser(), new_vm))
 
     with settings(warn_only=True):
         while run('ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  %s@%s "sudo sh -c \'echo %s > /etc/hostname ; sudo start hostname \'"'  % (SSHUSER, dns_name, name)) == '1':
