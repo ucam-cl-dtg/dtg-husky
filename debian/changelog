@@ -1,3 +1,19 @@
+cl-dtg-make-vm (0.0.13) precise; urgency=low
+
+  [ Oliver Chick ]
+  * Checks that VM names are not already used before creating a new one with the same name.
+  * Set the VM description as its puppy number for cloned machines.
+  * Don't count lines. Just see if the string is empty
+  * Added the crsid of the VM's creator to the description.
+  * Remove a race condition in the ordering of SSH commands. The condition could result in a VM not getting the most up-to-date puppet config on creation. An error is thrown by cl-dtg-make-vm when this occurs.
+
+  [ Andrew Rice ]
+  * New script to work out what the DNS name of a VM is by finding its MAC, working out what IP it has from dhcp and then doing a reverse lookup
+
+  [ Oliver Chick ]
+
+ -- Oliver Chick <oc243@cl.cam.ac.uk>  Wed, 10 Apr 2013 10:19:53 +0100
+
 cl-dtg-make-vm (0.0.12) precise; urgency=high
 
   * Fix bug in installer that wrote to /usr.bin
