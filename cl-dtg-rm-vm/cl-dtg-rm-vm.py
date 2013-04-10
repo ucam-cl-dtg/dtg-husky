@@ -17,10 +17,10 @@ def rm_vm(name):
     # Find the uuid of the VM and abort if we don't find exactly 1 result
     uuid = run('xe vm-list name-label=%s --minimal params=uuid' % (name)).strip()
     if not uuid:
-        abort("Failed to find vm with name-label=%s" % (name))
+        abort("Failed to find VM with name-label=%s" % (name))
     uuids = uuid.split(",")
     if len(uuids) != 1:
-        abort("Found %d vms with name-label=%s" % (len(uuids),name))
+        abort("Found %d VMs with name-label=%s" % (len(uuids),name))
     uuid = uuids[0]
 
     # Find out the owner of the VM by reading the name-description parameter from xe
