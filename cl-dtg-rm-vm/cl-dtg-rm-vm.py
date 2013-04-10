@@ -1,7 +1,8 @@
 #! /usr/bin/env python2.7
 
 from fabric.api import *
-import argparse, subprocess
+from fabric.utils import *
+import argparse, subprocess, getpass, re
 
 dom0 = 'husky0.dtg.cl.cam.ac.uk'
 
@@ -12,6 +13,28 @@ def rm_vm(name):
     """
     Destroy an existing VM.
     """
+
+    # Find the uuid of the VM and abort if we don't find exactly 1 result
+    uuid = run('xe vm-list name-label=%s --minimal params=uuid' % (name)).strip()
+    if not uuid:
+        abort("Failed to find VM with name-label=%s" % (name))
+    uuids = uuid.split(",")
+    if len(uuids) != 1:
+        abort("Found %d VMs with name-label=%s" % (len(uuids),name))
+    uuid = uuids[0]
+
+    # Find out the owner of the VM by reading the name-description parameter from xe
+    desc = run('xe vm-param-get uuid=%s param-name=name-description' % (uuid)).strip()
+    if not desc:
+        abort("Failed to find name-description parameter for this VM")
+    m = re.match(".+? - ([0-9a-z]+)",desc)
+    if not m:
+        abort("Failed to parse name-description parameter: %s" % (desc))
+    owner = m.group(1)
+
+    # Ensure that the owner of the VM matches the user running this script
+    if getpass.getuser() != owner:
+        abort("This VM is owned by a different user %s" % (owner))
 
     vdi_uuids = run('xe vbd-list vm-name-label=%s --minimal params=vdi-uuid' % (name))
 
