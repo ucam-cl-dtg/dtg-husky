@@ -23,14 +23,23 @@ def rm_vm(name):
         abort("Found %d VMs with name-label=%s" % (len(uuids),name))
     uuid = uuids[0]
 
-    # Find out the owner of the VM by reading the name-description parameter from xe
-    owner = run('xe vm-param-get uuid=%s param-name=other-config param-key=XenCenter.CustomFields.owner' % (uuid)).strip()
-    if not owner:
-        abort("Failed to find owner parameter (other-config:XenCenter.CustomFields.owner) for this VM")
-
-    # Ensure that the owner of the VM matches the user running this script
-    if getpass.getuser() != owner:
-        abort("This VM is owned by a different user %s" % (owner))
+    # Check that this domain is deletable
+    deletable_by = run('xe vm-param-get uuid=%s param-name=other-config param-key=XenCenter.CustomFields.deletable-by' % (uuid)).strip()
+    if deletable_by == "none":
+        abort('Cannot delete VM - it is set to be not deletable (other-config:XenCenter.CustomFields.deletable-by == "none")')
+    elif deletable_by == "owner":
+        # Find out the owner of the VM by reading the name-description parameter from xe
+        owner = run('xe vm-param-get uuid=%s param-name=other-config param-key=XenCenter.CustomFields.owner' % (uuid)).strip()
+        if not owner:
+            abort("Cannot delete VM - failed to find owner parameter (other-config:XenCenter.CustomFields.owner) for this VM")
+        
+        # Ensure that the owner of the VM matches the user running this script
+        if getpass.getuser() != owner:
+            abort('Cannot delete VM - it is set to be deletable only by its owner (other-config:XenCenter.CustomFields.deletable-by == "owner") and its owner is currently set to %s' % (owner))
+    elif deletable_by == "all":
+        pass
+    else:
+        abort("Cannot delete VM - the deletable-by parameter (other-config:XenCenter.CustomFields.deletable-by) has an unrecognised value (%s)" % (deletable_by))
 
     vdi_uuids = run('xe vbd-list vm-name-label=%s --minimal params=vdi-uuid' % (name))
 
