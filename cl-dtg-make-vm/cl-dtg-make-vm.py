@@ -1,7 +1,7 @@
 #! /usr/bin/env python2.7
 
 from fabric.api import *
-import sys, argparse, subprocess, socket
+import sys, argparse, subprocess, socket, getpass
 from datetime import date
 from time import sleep
 
@@ -45,6 +45,12 @@ def validIP(address):
             return False
     return True
 
+def check_name(name):
+    duplicate_name = run('xe vm-list name-label=%s' % name).strip()
+    if duplicate_name:
+        sys.stderr.write('Duplicate VM name: %s. You might wish to use cl-dtg-rm-vm.' % name)
+        sys.exit(1)
+
 def prepare_vm(ip, mac, uuid, memory, vcpus):
     """
     Assigns a mac address, memory and vcpus to a VM.
@@ -69,6 +75,8 @@ def new_vm(name, ip="", mac="", memory=DEFAULTMAXMEMORY, vcpus=DEFAULTVCPUs, roo
     """
     Create a new VM.
     """
+
+    check_name(name)
 
     # Create a VM
     new_vm = run('xe vm-install new-name-label=%s template=%s sr-uuid=%s' % (name, TEMPLATE, fs_location))
@@ -107,6 +115,8 @@ def new_cloned_vm(name, ip="", mac="", memory=DEFAULTMAXMEMORY, vcpus=DEFAULTVCP
     however the VM uses copy-on-write.
     """
 
+    check_name(name)
+
     # Create VM from snapshot
     run('xe vm-clone new-name-label=%s vm=%s' % (name, TEMPLATENAME))
     new_vm = run('xe template-list name-label=%s params=uuid --minimal' % name)
@@ -130,10 +140,12 @@ def new_cloned_vm(name, ip="", mac="", memory=DEFAULTMAXMEMORY, vcpus=DEFAULTVCP
     dns_name = socket.gethostbyaddr(ip)[0]
     print dns_name
 
+    run('xe vm-param-set name-description="%s - %s" uuid=%s' % (dns_name, getpass.getuser(), new_vm))
+
     with settings(warn_only=True):
-        while run('ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  %s@%s "sudo sh -c \'echo %s > /etc/hostname ; sudo start hostname ; /etc/rc2.d/S76vm-boot \'"'  % (SSHUSER, dns_name, name)) == '1':
+        while run('ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  %s@%s "sudo sh -c \'echo %s > /etc/hostname ; sudo start hostname \'"'  % (SSHUSER, dns_name, name)) == '1':
             sleep(1)
-    run('nohup ssh -n -f -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no %s@%s "cd /etc/puppet-bare; sudo git fetch -f git://github.com/ucam-cl-dtg/dtg-puppet.git master:master; nohup sudo bash /etc/puppet-bare/hooks/post-update >/var/log/puppet/install-log 2>&1"' % (SSHUSER, dns_name))
+    run('nohup ssh -n -f -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no %s@%s "/etc/rc2.d/S76vm-boot; cd /etc/puppet-bare; sudo git fetch -f git://github.com/ucam-cl-dtg/dtg-puppet.git master:master; nohup sudo bash /etc/puppet-bare/hooks/post-update >/var/log/puppet/install-log 2>&1"' % (SSHUSER, dns_name))
 
 
 @hosts(dhcp)
