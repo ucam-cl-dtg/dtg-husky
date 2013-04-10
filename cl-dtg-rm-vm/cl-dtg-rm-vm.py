@@ -24,13 +24,9 @@ def rm_vm(name):
     uuid = uuids[0]
 
     # Find out the owner of the VM by reading the name-description parameter from xe
-    desc = run('xe vm-param-get uuid=%s param-name=name-description' % (uuid)).strip()
-    if not desc:
-        abort("Failed to find name-description parameter for this VM")
-    m = re.match(".+? - ([0-9a-z]+)",desc)
-    if not m:
-        abort("Failed to parse name-description parameter: %s" % (desc))
-    owner = m.group(1)
+    owner = run('xe vm-param-get uuid=%s param-name=other-config param-key=XenCenter.CustomFields.owner' % (uuid)).strip()
+    if not owner:
+        abort("Failed to find owner parameter (other-config:XenCenter.CustomFields.owner) for this VM")
 
     # Ensure that the owner of the VM matches the user running this script
     if getpass.getuser() != owner:
