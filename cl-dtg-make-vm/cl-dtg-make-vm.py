@@ -140,7 +140,9 @@ def new_cloned_vm(name, ip="", mac="", memory=DEFAULTMAXMEMORY, vcpus=DEFAULTVCP
     dns_name = socket.gethostbyaddr(ip)[0]
     print dns_name
 
-    run('xe vm-param-set name-description="%s - %s" uuid=%s' % (dns_name, getpass.getuser(), new_vm))
+    run('xe vm-param-set name-description="%s" uuid=%s' % (dns_name, new_vm))
+    run('xe vm-param-set other-config:XenCenter.CustomFields.owner="%s" uuid=%s' % (getpass.getuser(), new_vm))
+    run('xe vm-param-set other-config:XenCenter.CustomFields.deletable-by="owner" uuid=%s' % (new_vm))
 
     with settings(warn_only=True):
         while run('ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  %s@%s "sudo sh -c \'echo %s > /etc/hostname ; sudo start hostname \'"'  % (SSHUSER, dns_name, name)) == '1':
@@ -164,8 +166,8 @@ def next_mac():
     """
     Finds a MAC address that is not currently assigned to a VM.
     """
-    dhcp_macs = run('grep "hardware ethernet" /etc/dhcpd.conf | sed -e \'s/.*ethernet //\' -e \'s/;//\'')
-    assigned_macs = run('xe vif-list params=MAC | sed -e \'/^$/d\' -e \'s/.*: //\'')
+    dhcp_macs = run('grep "hardware ethernet" /etc/dhcpd.conf | sed -e \'s/.*ethernet //\' -e \'s/;//\'').upper()
+    assigned_macs = run('xe vif-list params=MAC | sed -e \'/^$/d\' -e \'s/.*: //\'').upper()
     return (list((set(dhcp_macs.split()) - set(assigned_macs.split())))[0])
 
 
