@@ -1,3 +1,16 @@
+cl-dtg-make-vm (0.0.14) precise; urgency=low
+
+  [ Andrew Rice ]
+  * cl-dtg-rm-vm: added a check to ensure that you are the owner of a vm you try to delete
+  * Fixed capitalisation of vm to VM
+  * Changed the name-description parameter of the VM to hold only the DNS name, moved owner to a XenCenter.Customfield
+  * Used a new parameter deletable-by to indicate who can delete a VM.  By default it is set to owner.
+
+  [ Oliver Chick ]
+  * Case insensitive matching on mac addresses.
+
+ -- Oliver Chick <oc243@cl.cam.ac.uk>  Sat, 11 May 2013 00:58:08 +0100
+
 cl-dtg-make-vm (0.0.13) precise; urgency=low
 
   [ Oliver Chick ]
