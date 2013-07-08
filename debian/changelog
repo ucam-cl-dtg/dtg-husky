@@ -1,3 +1,10 @@
+cl-dtg-make-vm (0.0.15) UNRELEASED; urgency=low
+
+  * Fixing a bug whereby cl-dtg-find-vm would not find a VM whose name contains a space.
+  * Updated tempalte UUID, after it was regenerated following the update to 6.2
+
+ -- Oliver Chick <oc243@cl.cam.ac.uk>  Mon, 08 Jul 2013 11:39:34 +0100
+
 cl-dtg-make-vm (0.0.14) precise; urgency=low
 
   [ Andrew Rice ]
