@@ -16,7 +16,7 @@ def find_vm(name):
     Find the dns name for an existing VM.
     """
 
-    macs = run('xe vm-vif-list vm=%s --minimal params=MAC' % (name)).strip()
+    macs = run('xe vm-vif-list vm="%s" --minimal params=MAC' % (name)).strip()
     if not macs:
         abort("No network interfaces found for %s" % (name))
 

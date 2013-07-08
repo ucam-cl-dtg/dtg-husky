@@ -11,7 +11,7 @@ dom0 = 'husky0.dtg.cl.cam.ac.uk'
 env.user="root"
 
 # OS
-TEMPLATE          = '66456203-e601-9bd7-2022-6f2158f375ac'
+TEMPLATE          = '115a8d15-a73d-85bb-09df-103768ed36ee'
 INSTALLREPO       = 'http://www-uxsup.csx.cam.ac.uk/pub/linux/ubuntu'
 PRESEEDLOCATION   = 'http://git.dtg.cl.cam.ac.uk/?p=husky/preseed.git;a=blob_plain;f=puppy-preseed.cfg;hb=HEAD'
 
