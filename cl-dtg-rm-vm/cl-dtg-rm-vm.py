@@ -14,13 +14,15 @@ def rm_vm(name):
     Destroy an existing VM.
     """
 
+    name = name.replace('"','\\"')
+    
     # Find the uuid of the VM and abort if we don't find exactly 1 result
-    uuid = run('xe vm-list name-label=%s --minimal params=uuid' % (name)).strip()
+    uuid = run('xe vm-list name-label="%s" --minimal params=uuid' % (name)).strip()
     if not uuid:
-        abort("Failed to find VM with name-label=%s" % (name))
+        abort('Failed to find VM with name-label="%s"' % (name))
     uuids = uuid.split(",")
     if len(uuids) != 1:
-        abort("Found %d VMs with name-label=%s" % (len(uuids),name))
+        abort('Found %d VMs with name-label="%s"' % (len(uuids),name))
     uuid = uuids[0]
 
     # Check that this domain is deletable
@@ -41,9 +43,9 @@ def rm_vm(name):
     else:
         abort("Cannot delete VM - the deletable-by parameter (other-config:XenCenter.CustomFields.deletable-by) has an unrecognised value (%s)" % (deletable_by))
 
-    vdi_uuids = run('xe vbd-list vm-name-label=%s --minimal params=vdi-uuid' % (name))
+    vdi_uuids = run('xe vbd-list vm-name-label="%s" --minimal params=vdi-uuid' % (name))
 
-    run('xe vm-uninstall vm=%s force=true' % (name))
+    run('xe vm-uninstall vm="%s" force=true' % (name))
 
     for uuid in vdi_uuids.strip().split(","):
         vdi_check = run('xe vdi-list uuid=%s' % (uuid)).strip()
