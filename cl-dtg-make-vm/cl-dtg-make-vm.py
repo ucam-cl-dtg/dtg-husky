@@ -19,7 +19,7 @@ PRESEEDLOCATION   = 'http://git.dtg.cl.cam.ac.uk/?p=husky/preseed.git;a=blob_pla
 DEFAULTROOTFSSIZE = '8'
 DEFAULTDATAFSSIZE = '1'
 DEFAULTSR         = 'NFS\ virtual\ disk\ storage'
-SR                = 'b1bb7fa6-ca99-c984-4002-940ac6757e3e'
+SR                = '53a849fd-d3a0-7857-bb9c-302871a45127'
 
 # Networking
 NETWORK           = '77922c07-8ea4-abb2-708b-4719f4c6a0f8'
