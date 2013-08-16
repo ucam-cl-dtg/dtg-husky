@@ -1,3 +1,16 @@
+cl-dtg-make-vm (0.0.16) precise; urgency=low
+
+  [ Oliver Chick ]
+  * Quote, and escape name-labels.
+
+  [ Rip Sohan ]
+  * trivial patches enc.
+
+  [ Oliver Chick ]
+  * Change SR for the make script to be the SR on NAS04
+
+ -- Oliver Chick <oc243@cl.cam.ac.uk>  Fri, 16 Aug 2013 22:45:25 +0100
+
 cl-dtg-make-vm (0.0.15) UNRELEASED; urgency=low
 
   * Fixing a bug whereby cl-dtg-find-vm would not find a VM whose name contains a space.
