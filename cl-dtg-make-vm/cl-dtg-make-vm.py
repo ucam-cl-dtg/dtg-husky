@@ -19,7 +19,7 @@ PRESEEDLOCATION   = 'http://git.dtg.cl.cam.ac.uk/?p=husky/preseed.git;a=blob_pla
 DEFAULTROOTFSSIZE = '8'
 DEFAULTDATAFSSIZE = '1'
 DEFAULTSR         = 'NFS\ virtual\ disk\ storage'
-SR                = 'b1bb7fa6-ca99-c984-4002-940ac6757e3e'
+SR                = '53a849fd-d3a0-7857-bb9c-302871a45127'
 
 # Networking
 NETWORK           = '77922c07-8ea4-abb2-708b-4719f4c6a0f8'
@@ -108,7 +108,7 @@ def new_vm(name, ip="", mac="", memory=DEFAULTMAXMEMORY, vcpus=DEFAULTVCPUs, roo
 
 
 @hosts(dom0)
-def new_cloned_vm(name, ip="", mac="", memory=DEFAULTMAXMEMORY, vcpus=DEFAULTVCPUs, data_size=DEFAULTDATAFSSIZE, data_SR=SR):
+def new_cloned_vm(name, ip="", mac="", memory=DEFAULTMAXMEMORY, vcpus=DEFAULTVCPUs, root_fs_size=DEFAULTROOTFSSIZE, data_size=DEFAULTDATAFSSIZE, data_SR=SR):
     """
     Build a new VM by cloning the most recent DTG-snapshot.
     This will give a DTG-itised VM, much faster than calling new_vm,
@@ -185,8 +185,8 @@ if __name__ == '__main__':
     # Optional args
     parser.add_argument('-m', '--memory', type=int, help='memory (in MB) assigned to VM')
     parser.add_argument('-v', '--vcpus', type=int, help='Number of VCPUs')
-    parser.add_argument('-r', '--rootfs', dest='root_fs_size', type=int, help='Size of /dev/xvda, the root filesystem')
-    parser.add_argument('-d', '--datafs', dest='data_size', type=int, help='Size of /dev/xvdb, the data partition, mounted on /data/local')
+    parser.add_argument('-r', '--rootfs', dest='root_fs_size', type=int, help='Size of /dev/xvda, the root filesystem (in GB)')
+    parser.add_argument('-d', '--datafs', dest='data_size', type=int, help='Size of /dev/xvdb, the data partition, mounted on /data/local (in GB)')
     parser.add_argument('-l', '--dataloc', help='Storage repository to use for the data partition')
 
     # Name is required
