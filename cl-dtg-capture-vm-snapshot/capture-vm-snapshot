@@ -1,6 +1,6 @@
 #! /bin/bash
 
-user="root"
+guest_user="root"
 
 if [ $# -lt 1 ]; then
     echo "Usage: capture-vm-snapshot name"
@@ -21,7 +21,7 @@ ip="$(xe vm-param-get param-name=networks uuid=$vm_uuid | sed -e 's_0/ip: __' -e
 
 RET=1
 until [ $RET -eq 0 ]; do
-    ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=7200 -o PreferredAuthentications=publickey ${user}@${ip} <<ESSH
+    ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=7200 -o PreferredAuthentications=publickey ${guest_user}@${ip} <<ESSH
 	  while [ $(pgrep puppet) ] || [ ! -d /etc/puppet ]; do
 	    sleep 2
 	  done
