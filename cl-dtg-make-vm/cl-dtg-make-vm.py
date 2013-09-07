@@ -5,10 +5,8 @@ import sys, argparse, subprocess, socket, getpass
 from datetime import date
 from time import sleep
 
-dhcp = 'husky0.dtg.cl.cam.ac.uk'
-dom0 = 'husky0.dtg.cl.cam.ac.uk'
-
-env.user="root"
+dhcp = env.user + '@dhcp.dtg.cl.cam.ac.uk'
+dom0 = 'root@husky0.dtg.cl.cam.ac.uk'
 
 # OS
 TEMPLATE          = '115a8d15-a73d-85bb-09df-103768ed36ee'
@@ -45,20 +43,17 @@ def validIP(address):
             return False
     return True
 
+@hosts(dom0)
 def check_name(name):
     duplicate_name = run('xe vm-list name-label=%s' % name).strip()
     if duplicate_name:
         sys.stderr.write('Duplicate VM name: %s. You might wish to use cl-dtg-rm-vm.' % name)
         sys.exit(1)
 
-def prepare_vm(ip, mac, uuid, memory, vcpus):
+def prepare_vm(mac, uuid, memory, vcpus):
     """
     Assigns a mac address, memory and vcpus to a VM.
     """
-    if ip != "":
-        mac = ip_to_mac(ip)
-    if mac == "":
-        mac = next_mac()
 
     # Give the VM a VIF
     run('xe vif-create network-uuid=%s mac=%s vm-uuid=%s device=%s' % (NETWORK, mac, uuid, DEVICE))
@@ -70,14 +65,18 @@ def prepare_vm(ip, mac, uuid, memory, vcpus):
     run('xe vm-memory-limits-set uuid=%s dynamic-max=%sMiB static-max=%sMiB static-min=%sMiB dynamic-min=%sMiB' % (uuid, memory, memory, DEFAULTMINMEMORY, DEFAULTMINMEMORY))
 
 
-@hosts(dom0)
-def new_vm(name, ip="", mac="", memory=DEFAULTMAXMEMORY, vcpus=DEFAULTVCPUs, root_fs_size=DEFAULTROOTFSSIZE, fs_location=SR):
+def new_vm(name, mac, memory, vcpus, root_fs_size, fs_location=SR, **kwargs):
     """
     Create a new VM.
     """
 
-    check_name(name)
+    execute(check_name, name)
+    if mac == None:
+        mac = next_mac()
+    execute(host_build_vm, name, mac, memory, vcpus, root_fs_size, fs_location)
 
+@hosts(dom0)
+def host_build_vm(name, mac, memory, vcpus, root_fs_size, fs_location):
     # Create a VM
     new_vm = run('xe vm-install new-name-label=%s template=%s sr-uuid=%s' % (name, TEMPLATE, fs_location))
 
@@ -98,7 +97,7 @@ def new_vm(name, ip="", mac="", memory=DEFAULTMAXMEMORY, vcpus=DEFAULTVCPUs, roo
     # Set the preseed file, and pass a hostname, and password hash
     run('xe vm-param-set uuid=%s PV-args=" --quiet console=hvc0 auto=true url=%s netcfg/get_hostname=%s"' % (new_vm, PRESEEDLOCATION, name))
 
-    prepare_vm(ip, mac, new_vm, memory, vcpus)
+    prepare_vm(mac, new_vm, memory, vcpus)
 
     # Boot the VM, with an answer file
     run('xe vm-start vm=%s' % name)
@@ -107,22 +106,28 @@ def new_vm(name, ip="", mac="", memory=DEFAULTMAXMEMORY, vcpus=DEFAULTVCPUs, roo
     run('nohup ./capture-vm-snapshot.sh %s &' % name)
 
 
-@hosts(dom0)
-def new_cloned_vm(name, ip="", mac="", memory=DEFAULTMAXMEMORY, vcpus=DEFAULTVCPUs, root_fs_size=DEFAULTROOTFSSIZE, data_size=DEFAULTDATAFSSIZE, data_SR=SR):
+def new_cloned_vm(name, ip, mac, memory, vcpus, root_fs_size, data_size, data_SR, **kwargs):
     """
     Build a new VM by cloning the most recent DTG-snapshot.
     This will give a DTG-itised VM, much faster than calling new_vm,
     however the VM uses copy-on-write.
     """
+    execute(check_name, name)
 
-    check_name(name)
+    if ip != None:
+        mac = execute(ip_to_mac, ip)
+    if mac == None:
+        mac = next_mac()
+    execute(host_build_cloned_vm, name, mac, memory, vcpus, root_fs_size, data_size, data_SR)
 
+@hosts(dom0)
+def host_build_cloned_vm(name, mac, memory, vcpus, root_fs_size, data_size, data_SR):
     # Create VM from snapshot
     run('xe vm-clone new-name-label=%s vm=%s' % (name, TEMPLATENAME))
     new_vm = run('xe template-list name-label=%s params=uuid --minimal' % name)
     run('xe template-param-set is-a-template=false uuid=%s' % new_vm)
 
-    prepare_vm(ip, mac, new_vm, memory, vcpus)
+    prepare_vm(mac, new_vm, memory, vcpus)
 
     # Create a /dev/xvdb that can be mounted at /data/local
     if data_size > 0:
@@ -133,6 +138,7 @@ def new_cloned_vm(name, ip="", mac="", memory=DEFAULTMAXMEMORY, vcpus=DEFAULTVCP
 
     # SSH into the new machine, and set the hostname. First wait for the m/c to boot
 
+    ip=""
     while not validIP(ip):
         ip = run('xe vm-param-get param-name=networks uuid=%s | sed -e \'s_0/ip: __\' -e \'s/; .*$//\'' % new_vm)
         sleep(1)
@@ -147,7 +153,7 @@ def new_cloned_vm(name, ip="", mac="", memory=DEFAULTMAXMEMORY, vcpus=DEFAULTVCP
     with settings(warn_only=True):
         while run('ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  %s@%s "sudo sh -c \'echo %s > /etc/hostname ; sudo start hostname \'"'  % (SSHUSER, dns_name, name)) == '1':
             sleep(1)
-    run('nohup ssh -n -f -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no %s@%s "/etc/rc2.d/S76vm-boot; cd /etc/puppet-bare; sudo git fetch -f git://github.com/ucam-cl-dtg/dtg-puppet.git master:master; nohup sudo bash /etc/puppet-bare/hooks/post-update >/var/log/puppet/install-log 2>&1"' % (SSHUSER, dns_name))
+    run('nohup ssh -n -f -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no %s@%s "/etc/rc2.d/S76vm-boot; sudo apt-get update; cd /etc/puppet-bare; sudo git fetch -f git://github.com/ucam-cl-dtg/dtg-puppet.git master:master; nohup sudo bash /etc/puppet-bare/hooks/post-update >/var/log/puppet/install-log 2>&1"' % (SSHUSER, dns_name))
 
 
 @hosts(dhcp)
@@ -162,16 +168,25 @@ def ip_to_mac(ip):
     return mac
 
 @hosts(dhcp)
+def macs_in_pool():
+    return run('grep "hardware ethernet" /etc/dhcp/dhcpd.hosts | sed -e \'s/.*ethernet //\' -e \'s/;//\'').upper()
+
+@hosts(dom0)
+def dom0_macs():
+    return run('xe vif-list params=MAC | sed -e \'/^$/d\' -e \'s/.*: //\'').upper()
+
 def next_mac():
     """
     Finds a MAC address that is not currently assigned to a VM.
     """
-    dhcp_macs = run('grep "hardware ethernet" /etc/dhcpd.conf | sed -e \'s/.*ethernet //\' -e \'s/;//\'').upper()
-    assigned_macs = run('xe vif-list params=MAC | sed -e \'/^$/d\' -e \'s/.*: //\'').upper()
-    return (list((set(dhcp_macs.split()) - set(assigned_macs.split())))[0])
+    dhcp_macs = [ x.strip() for x in execute(macs_in_pool).values()[0].split("\r\n") ]
+    assigned_macs = [ x.strip() for x in execute(dom0_macs).values()[0].split("\r\n") ]
+    return ((set(dhcp_macs) - set(assigned_macs)).pop())
 
 
 if __name__ == '__main__':
+    output['running'] = False
+    output['stdout'] = False
 
     parser = argparse.ArgumentParser(description='Make a VM on the DTG husky cluster. The resulting VM will, by the magic of drt24\'s puppet, contain much DTG goodness')
 
@@ -183,22 +198,18 @@ if __name__ == '__main__':
     ip_mac_group.add_argument('-M', '--mac', help='MAC address to assign the VM\s VIF')
 
     # Optional args
-    parser.add_argument('-m', '--memory', type=int, help='memory (in MB) assigned to VM')
-    parser.add_argument('-v', '--vcpus', type=int, help='Number of VCPUs')
-    parser.add_argument('-r', '--rootfs', dest='root_fs_size', type=int, help='Size of /dev/xvda, the root filesystem (in GB)')
-    parser.add_argument('-d', '--datafs', dest='data_size', type=int, help='Size of /dev/xvdb, the data partition, mounted on /data/local (in GB)')
-    parser.add_argument('-l', '--dataloc', help='Storage repository to use for the data partition')
+    parser.add_argument('-m', '--memory', default=DEFAULTMAXMEMORY, type=int, help='memory (in MB) assigned to VM')
+    parser.add_argument('-v', '--vcpus', default=DEFAULTVCPUs, type=int, help='Number of VCPUs')
+    parser.add_argument('-r', '--rootfs', dest='root_fs_size', default=DEFAULTROOTFSSIZE, type=int, help='Size of /dev/xvda, the root filesystem (in GB)')
+    parser.add_argument('-d', '--datafs', dest='data_size', default=DEFAULTDATAFSSIZE, type=int, help='Size of /dev/xvdb, the data partition, mounted on /data/local (in GB)')
+    parser.add_argument('-l', '--dataloc', default=SR, dest='data_SR', help='Storage repository to use for the data partition')
 
     # Name is required
     parser.add_argument('name', help='The hostname of the VM')
 
     parsed_args = vars(parser.parse_args())
-    argstring = ""
-    for param in parsed_args.keys():
-        if parsed_args[param] != None and param != 'new_template':
-            argstring = '%s%s=%s,' % (argstring, param, parsed_args[param])
 
-    argstring = argstring[:-1]
-
-    command = 'new_vm' if parsed_args['new_template'] else 'new_cloned_vm'
-    subprocess.call(['fab', '--hide=output,running', '-f', __file__] + [command + ':' + argstring])
+    if parsed_args['new_template']:
+        new_vm(**parsed_args)
+    else:
+        new_cloned_vm(**parsed_args)
