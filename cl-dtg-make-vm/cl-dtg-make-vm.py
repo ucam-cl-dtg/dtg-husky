@@ -125,6 +125,8 @@ def host_build_cloned_vm(name, mac, memory, vcpus, root_fs_size, data_size, data
     # Create VM from snapshot
     run('xe vm-clone new-name-label=%s vm=%s' % (name, TEMPLATENAME))
     new_vm = run('xe template-list name-label=%s params=uuid --minimal' % name)
+    run('xe vm-param-set other-config:XenCenter.CustomFields.owner="%s" uuid=%s' % (getpass.getuser(), new_vm))
+    run('xe vm-param-set other-config:XenCenter.CustomFields.deletable-by="owner" uuid=%s' % (new_vm))
     run('xe template-param-set is-a-template=false uuid=%s' % new_vm)
 
     prepare_vm(mac, new_vm, memory, vcpus)
@@ -147,8 +149,6 @@ def host_build_cloned_vm(name, mac, memory, vcpus, root_fs_size, data_size, data
     print dns_name
 
     run('xe vm-param-set name-description="%s" uuid=%s' % (dns_name, new_vm))
-    run('xe vm-param-set other-config:XenCenter.CustomFields.owner="%s" uuid=%s' % (getpass.getuser(), new_vm))
-    run('xe vm-param-set other-config:XenCenter.CustomFields.deletable-by="owner" uuid=%s' % (new_vm))
 
     with settings(warn_only=True):
         while run('ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  %s@%s "sudo sh -c \'echo %s > /etc/hostname ; sudo start hostname \'"'  % (SSHUSER, dns_name, name)) == '1':
