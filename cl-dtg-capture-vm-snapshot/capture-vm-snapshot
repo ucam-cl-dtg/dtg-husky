@@ -21,6 +21,9 @@ ip="$(xe vm-param-get param-name=networks uuid=$vm_uuid | sed -e 's_0/ip: __' -e
 
 RET=1
 until [ $RET -eq 0 ]; do
+    # We cannot verify the fingerprint of the host. We have just built it from
+    # a fresh install, and so have no previous value to compare it with.
+    # Therefore we don't check host keys
     ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=7200 -o PreferredAuthentications=publickey ${guest_user}@${ip} <<ESSH
 	  while [ $(pgrep puppet) ] || [ ! -d /etc/puppet ]; do
 	    sleep 2
