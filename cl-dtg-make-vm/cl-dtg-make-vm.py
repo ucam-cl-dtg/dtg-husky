@@ -75,7 +75,7 @@ def new_vm(name, ip="", mac="", memory=DEFAULTMAXMEMORY, vcpus=DEFAULTVCPUs, roo
     Create a new VM.
     """
 
-    check_name(name)
+    execute(check_name, name)
 
     # Create a VM
     new_vm = run('xe vm-install new-name-label=%s template=%s sr-uuid=%s' % (name, TEMPLATE, fs_location))
@@ -113,8 +113,8 @@ def new_cloned_vm(name, ip="", mac="", memory=DEFAULTMAXMEMORY, vcpus=DEFAULTVCP
     This will give a DTG-itised VM, much faster than calling new_vm,
     however the VM uses copy-on-write.
     """
+    execute(check_name, name)
 
-    check_name(name)
 
     # Create VM from snapshot
     run('xe vm-clone new-name-label=%s vm=%s' % (name, TEMPLATENAME))
