@@ -129,6 +129,11 @@ def host_build_cloned_vm(name, mac, memory, vcpus, root_fs_size, data_size, data
     run('xe vm-param-set other-config:XenCenter.CustomFields.deletable-by="owner" uuid=%s' % (new_vm))
     run('xe template-param-set is-a-template=false uuid=%s' % new_vm)
 
+    vdi = run('xe vbd-list vm-uuid=%s params=vdi-uuid --minimal' % new_vm)
+    run('xe vdi-param-set name-label=%s uuid=%s' % (name + '-os', vdi))
+    if (root_fs_size != DEFAULTROOTFSSIZE):
+        run('xe vdi-resize uuid=%s disk-size=%sGiB' % (vdi, root_fs_size))
+
     prepare_vm(mac, new_vm, memory, vcpus)
 
     # Create a /dev/xvdb that can be mounted at /data/local
