@@ -50,14 +50,10 @@ def check_name(name):
         sys.stderr.write('Duplicate VM name: %s. You might wish to use cl-dtg-rm-vm.' % name)
         sys.exit(1)
 
-def prepare_vm(ip, mac, uuid, memory, vcpus):
+def prepare_vm(mac, uuid, memory, vcpus):
     """
     Assigns a mac address, memory and vcpus to a VM.
     """
-    if ip != "":
-        mac = ip_to_mac(ip)
-    if mac == "":
-        mac = next_mac()
 
     # Give the VM a VIF
     run('xe vif-create network-uuid=%s mac=%s vm-uuid=%s device=%s' % (NETWORK, mac, uuid, DEVICE))
@@ -75,6 +71,8 @@ def new_vm(name, mac, memory, vcpus, root_fs_size, fs_location=SR, **kwargs):
     """
 
     execute(check_name, name)
+    if mac == None:
+        mac = next_mac()
 
     # Create a VM
     new_vm = run('xe vm-install new-name-label=%s template=%s sr-uuid=%s' % (name, TEMPLATE, fs_location))
@@ -96,7 +94,7 @@ def new_vm(name, mac, memory, vcpus, root_fs_size, fs_location=SR, **kwargs):
     # Set the preseed file, and pass a hostname, and password hash
     run('xe vm-param-set uuid=%s PV-args=" --quiet console=hvc0 auto=true url=%s netcfg/get_hostname=%s"' % (new_vm, PRESEEDLOCATION, name))
 
-    prepare_vm(ip, mac, new_vm, memory, vcpus)
+    prepare_vm(mac, new_vm, memory, vcpus)
 
     # Boot the VM, with an answer file
     run('xe vm-start vm=%s' % name)
@@ -113,13 +111,17 @@ def new_cloned_vm(name, ip, mac, memory, vcpus, root_fs_size, data_size, data_SR
     """
     execute(check_name, name)
 
+    if ip != None:
+        mac = execute(ip_to_mac, ip)
+    if mac == None:
+        mac = next_mac()
 
     # Create VM from snapshot
     run('xe vm-clone new-name-label=%s vm=%s' % (name, TEMPLATENAME))
     new_vm = run('xe template-list name-label=%s params=uuid --minimal' % name)
     run('xe template-param-set is-a-template=false uuid=%s' % new_vm)
 
-    prepare_vm(ip, mac, new_vm, memory, vcpus)
+    prepare_vm(mac, new_vm, memory, vcpus)
 
     # Create a /dev/xvdb that can be mounted at /data/local
     if data_size > 0:
@@ -160,13 +162,20 @@ def ip_to_mac(ip):
     return mac
 
 @hosts(dhcp)
+def macs_in_pool():
+    return run('grep "hardware ethernet" /etc/dhcp/dhcpd.hosts | sed -e \'s/.*ethernet //\' -e \'s/;//\'').upper()
+
+@hosts(dom0)
+def dom0_macs():
+    return run('xe vif-list params=MAC | sed -e \'/^$/d\' -e \'s/.*: //\'').upper()
+
 def next_mac():
     """
     Finds a MAC address that is not currently assigned to a VM.
     """
-    dhcp_macs = run('grep "hardware ethernet" /etc/dhcpd.conf | sed -e \'s/.*ethernet //\' -e \'s/;//\'').upper()
-    assigned_macs = run('xe vif-list params=MAC | sed -e \'/^$/d\' -e \'s/.*: //\'').upper()
-    return (list((set(dhcp_macs.split()) - set(assigned_macs.split())))[0])
+    dhcp_macs = [ x.strip() for x in execute(macs_in_pool).values()[0].split("\r\n") ]
+    assigned_macs = [ x.strip() for x in execute(dom0_macs).values()[0].split("\r\n") ]
+    return ((set(dhcp_macs) - set(assigned_macs)).pop())
 
 
 if __name__ == '__main__':
