@@ -73,7 +73,10 @@ def new_vm(name, mac, memory, vcpus, root_fs_size, fs_location=SR, **kwargs):
     execute(check_name, name)
     if mac == None:
         mac = next_mac()
+    execute(host_build_vm, name, mac, memory, vcpus, root_fs_size, fs_location)
 
+@hosts(dom0)
+def host_build_vm(name, mac, memory, vcpus, root_fs_size, fs_location):
     # Create a VM
     new_vm = run('xe vm-install new-name-label=%s template=%s sr-uuid=%s' % (name, TEMPLATE, fs_location))
 
@@ -115,7 +118,10 @@ def new_cloned_vm(name, ip, mac, memory, vcpus, root_fs_size, data_size, data_SR
         mac = execute(ip_to_mac, ip)
     if mac == None:
         mac = next_mac()
+    execute(host_build_cloned_vm, name, mac, memory, vcpus, root_fs_size, data_size, data_SR)
 
+@hosts(dom0)
+def host_build_cloned_vm(name, mac, memory, vcpus, root_fs_size, data_size, data_SR):
     # Create VM from snapshot
     run('xe vm-clone new-name-label=%s vm=%s' % (name, TEMPLATENAME))
     new_vm = run('xe template-list name-label=%s params=uuid --minimal' % name)
