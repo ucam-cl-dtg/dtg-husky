@@ -132,6 +132,7 @@ def new_cloned_vm(name, ip="", mac="", memory=DEFAULTMAXMEMORY, vcpus=DEFAULTVCP
 
     # SSH into the new machine, and set the hostname. First wait for the m/c to boot
 
+    ip=""
     while not validIP(ip):
         ip = run('xe vm-param-get param-name=networks uuid=%s | sed -e \'s_0/ip: __\' -e \'s/; .*$//\'' % new_vm)
         sleep(1)
