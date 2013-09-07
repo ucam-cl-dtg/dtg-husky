@@ -1,3 +1,18 @@
+cl-dtg-make-vm (0.0.17) raring; urgency=low
+
+  * Run apt-get update on each VM after setting the hostname, and before puppet applying.
+  * Change location of dhcp to dhcp.dtg, and specify the usernames for dom0 and dhcp.dtg
+  * SPecify default values in argparse
+  * Specify the host that check_name should run on (dom0)
+  * Don't assume that we already have a valid iP
+  * Rely on fabric state to reduce verbosity
+  * Run check_name as a separate fabric task, to decouple checking a name from making a vm
+  * Use fabric's execute function to avoid shelling out to the fabric cli mode.
+  * Move responsibility for finding a free mac address from dom0 to the local machine executing a fab task.
+  * Split up the make tasks to differentiate between the parts taht run on dom0 and the parts that run locally
+
+ -- Oliver Chick <oc243@cl.cam.ac.uk>  Sat, 07 Sep 2013 18:26:37 +0100
+
 cl-dtg-make-vm (0.0.16) precise; urgency=low
 
   [ Oliver Chick ]
