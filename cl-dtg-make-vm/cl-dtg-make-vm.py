@@ -43,6 +43,7 @@ def validIP(address):
             return False
     return True
 
+@hosts(dom0)
 def check_name(name):
     duplicate_name = run('xe vm-list name-label=%s' % name).strip()
     if duplicate_name:
