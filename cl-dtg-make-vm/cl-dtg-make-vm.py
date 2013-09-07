@@ -5,10 +5,8 @@ import sys, argparse, subprocess, socket, getpass
 from datetime import date
 from time import sleep
 
-dhcp = 'husky0.dtg.cl.cam.ac.uk'
-dom0 = 'husky0.dtg.cl.cam.ac.uk'
-
-env.user="root"
+dhcp = env.user + '@dhcp.dtg.cl.cam.ac.uk'
+dom0 = 'root@husky0.dtg.cl.cam.ac.uk'
 
 # OS
 TEMPLATE          = '115a8d15-a73d-85bb-09df-103768ed36ee'
