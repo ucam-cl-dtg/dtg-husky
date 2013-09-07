@@ -172,6 +172,8 @@ def next_mac():
 
 
 if __name__ == '__main__':
+    output['running'] = False
+    output['stdout'] = False
 
     parser = argparse.ArgumentParser(description='Make a VM on the DTG husky cluster. The resulting VM will, by the magic of drt24\'s puppet, contain much DTG goodness')
 
