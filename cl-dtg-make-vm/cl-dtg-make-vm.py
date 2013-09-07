@@ -69,8 +69,7 @@ def prepare_vm(ip, mac, uuid, memory, vcpus):
     run('xe vm-memory-limits-set uuid=%s dynamic-max=%sMiB static-max=%sMiB static-min=%sMiB dynamic-min=%sMiB' % (uuid, memory, memory, DEFAULTMINMEMORY, DEFAULTMINMEMORY))
 
 
-@hosts(dom0)
-def new_vm(name, ip="", mac="", memory=DEFAULTMAXMEMORY, vcpus=DEFAULTVCPUs, root_fs_size=DEFAULTROOTFSSIZE, fs_location=SR):
+def new_vm(name, mac, memory, vcpus, root_fs_size, fs_location=SR, **kwargs):
     """
     Create a new VM.
     """
@@ -106,8 +105,7 @@ def new_vm(name, ip="", mac="", memory=DEFAULTMAXMEMORY, vcpus=DEFAULTVCPUs, roo
     run('nohup ./capture-vm-snapshot.sh %s &' % name)
 
 
-@hosts(dom0)
-def new_cloned_vm(name, ip="", mac="", memory=DEFAULTMAXMEMORY, vcpus=DEFAULTVCPUs, root_fs_size=DEFAULTROOTFSSIZE, data_size=DEFAULTDATAFSSIZE, data_SR=SR):
+def new_cloned_vm(name, ip, mac, memory, vcpus, root_fs_size, data_size, data_SR, **kwargs):
     """
     Build a new VM by cloning the most recent DTG-snapshot.
     This will give a DTG-itised VM, much faster than calling new_vm,
@@ -195,12 +193,8 @@ if __name__ == '__main__':
     parser.add_argument('name', help='The hostname of the VM')
 
     parsed_args = vars(parser.parse_args())
-    argstring = ""
-    for param in parsed_args.keys():
-        if parsed_args[param] != None and param != 'new_template':
-            argstring = '%s%s=%s,' % (argstring, param, parsed_args[param])
 
-    argstring = argstring[:-1]
-
-    command = 'new_vm' if parsed_args['new_template'] else 'new_cloned_vm'
-    subprocess.call(['fab', '--hide=output,running', '-f', __file__] + [command + ':' + argstring])
+    if parsed_args['new_template']:
+        new_vm(**parsed_args)
+    else:
+        new_cloned_vm(**parsed_args)
