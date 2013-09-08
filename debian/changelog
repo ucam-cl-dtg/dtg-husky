@@ -1,3 +1,23 @@
+cl-dtg-make-vm (0.0.18) raring; urgency=low
+
+  * Added the capture-vm-snapshot script, which is used to turn a VM into a template.
+  * Don't use camel case
+  * Don't echo $ip
+  * Check number of args, before using $1
+  * Check only one VM with that name label before doing anything with it
+  * Move user constant to top of file
+  * We need to SSH in as root, not dtg
+  * Don't die on errors, we want to keep trying SSH until it works.
+  * Keep trying to SSH into the newly created VM, until we get in. Then spin until puppet stops running.
+  * Specify the owner and deleteable by early on.
+  * More specific variable naming
+  * Add comment explaining why we disable host key checks
+  * Rename cl-dtg-make-vm.py to cl-dtg-make-vm, and remove the symlink.
+  * Implement the -r option, and rename /dev/xvda
+  * Rename capture-vm-snapshot to dom0-vm-to-template.sh
+
+ -- Oliver Chick <oc243@cl.cam.ac.uk>  Sun, 08 Sep 2013 11:41:41 +0100
+
 cl-dtg-make-vm (0.0.17) raring; urgency=low
 
   * Run apt-get update on each VM after setting the hostname, and before puppet applying.
