@@ -42,6 +42,8 @@ def mac_to_ip(mac):
                        
 
 if __name__ == '__main__':
+    output['running'] = False
+    output['stdout'] = False
 
     parser = argparse.ArgumentParser(description='Find the DNS name for a VM')
 
