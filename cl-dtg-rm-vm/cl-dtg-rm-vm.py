@@ -55,6 +55,9 @@ def rm_vm(name):
 
 if __name__ == '__main__':
 
+    output['running'] = False
+    output['stdout'] = False
+
     parser = argparse.ArgumentParser(description='Destroy a VM on the DTG husky cluster. This script removes the VM and deletes all its storage devices')
 
     parser.add_argument('name', help='The name of the VM')
