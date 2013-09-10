@@ -2,7 +2,8 @@
 
 from fabric.api import *
 from fabric.utils import *
-import argparse, subprocess, getpass, re
+import argparse
+import getpass
 
 dom0 = 'husky0.dtg.cl.cam.ac.uk'
 
@@ -59,12 +60,4 @@ if __name__ == '__main__':
     parser.add_argument('name', help='The name of the VM')
 
     parsed_args = vars(parser.parse_args())
-    argstring = ""
-    for param in parsed_args.keys():
-        if parsed_args[param] != None:
-            argstring = '%s%s=%s,' % (argstring, param, parsed_args[param])
-
-    argstring = argstring[:-1]
-    command = 'rm_vm'
-    subprocess.call(['fab', '--hide=output,running', '-f', __file__] + [command + ':' + argstring])
-
+    execute(rm_vm, **parsed_args)
