@@ -2,7 +2,7 @@
 
 from fabric.api import *
 from fabric.utils import *
-import argparse, subprocess
+import argparse
 import re
 
 dhcp = 'husky0.dtg.cl.cam.ac.uk'
@@ -48,12 +48,4 @@ if __name__ == '__main__':
     parser.add_argument('name', help='The name of the VM')
 
     parsed_args = vars(parser.parse_args())
-    argstring = ""
-    for param in parsed_args.keys():
-        if parsed_args[param] != None:
-            argstring = '%s%s=%s,' % (argstring, param, parsed_args[param])
-
-    argstring = argstring[:-1]
-    command = 'find_vm'
-    subprocess.call(['fab', '--hide=output,running', '-f', __file__] + [command + ':' + argstring])
-
+    execute(find_vm, **parsed_args)
