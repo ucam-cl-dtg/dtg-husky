@@ -1,3 +1,10 @@
+cl-dtg-make-vm (0.0.20) raring; urgency=low
+
+  * Tell fabric to get usernames from .ssh/config
+  * Don't specify $USER when we SSH into DHCP. We should just use the default.
+
+ -- Oliver Chick <oc243@cl.cam.ac.uk>  Wed, 11 Sep 2013 22:08:34 +0100
+
 cl-dtg-make-vm (0.0.19) raring; urgency=low
 
   * Use fabric's execute function to avoid shelling out
