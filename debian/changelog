@@ -1,3 +1,14 @@
+cl-dtg-make-vm (0.0.19) raring; urgency=low
+
+  * Use fabric's execute function to avoid shelling out
+  * Stop fabric printing being so verbose
+  * Remove file extension as we no longer rely on shelling out to fab
+  * Use fabric's execute to reduce LoC
+  * Reduce verbosity of fabric
+  * Remove file extension, and rely on the shebang
+
+ -- Oliver Chick <oc243@cl.cam.ac.uk>  Wed, 11 Sep 2013 09:12:41 +0100
+
 cl-dtg-make-vm (0.0.18) raring; urgency=low
 
   * Added the capture-vm-snapshot script, which is used to turn a VM into a template.
