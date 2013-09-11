@@ -1,9 +1,7 @@
 cl-dtg-make-vm/cl-dtg-make-vm usr/bin
 
 cl-dtg-rm-vm/cl-dtg-rm-vm /usr/bin
-cl-dtg-rm-vm/cl-dtg-rm-vm.py /usr/bin
 
 cl-dtg-find-vm/cl-dtg-find-vm /usr/bin
-cl-dtg-find-vm/cl-dtg-find-vm.py /usr/bin
 
 cl-dtg-move-to-dmz/cl-dtg-move-to-dmz.py /usr/bin
