@@ -141,6 +141,14 @@ def host_build_cloned_vm(name, mac, memory, vcpus, root_fs_size, data_size, data
         vdi_b_uuid = run('xe vdi-create sr-uuid=%s virtual-size=%sGiB name-label=%s-data type=user' % (data_SR, data_size, name))
         run('xe vbd-create vm-uuid=%s vdi-uuid=%s device=1' % (new_vm, vdi_b_uuid))
 
+    # Add a third disk for swap. We use a new disk rather than a partition
+    # to reduce the faff of repartitioning. We can also trash the swap disk
+    # trivially
+
+    vdi_c_uuid = run('xe vdi-create sr-uuid=%s virtual-size=%sMiB name-label=%s-swap type=user'
+                         % (data_SR, memory * 2, name))
+    run('xe vbd-create vm-uuid=%s vdi-uuid=%s device=2' % (new_vm, vdi_c_uuid))
+
     run('xe vm-start vm=%s' % name)
 
     # SSH into the new machine, and set the hostname. First wait for the m/c to boot
