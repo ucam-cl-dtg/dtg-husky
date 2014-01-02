@@ -11,29 +11,29 @@ DHCP = 'dhcp.dtg.cl.cam.ac.uk'
 DOM0 = 'root@husky0.dtg.cl.cam.ac.uk'
 
 # OS
-TEMPLATE          = '115a8d15-a73d-85bb-09df-103768ed36ee'
-INSTALLREPO       = 'http://www-uxsup.csx.cam.ac.uk/pub/linux/ubuntu'
-PRESEEDLOCATION   = 'http://git.dtg.cl.cam.ac.uk/?p=husky/preseed.git;a=blob_plain;f=puppy-preseed.cfg;hb=HEAD'
+TEMPLATE = '115a8d15-a73d-85bb-09df-103768ed36ee'
+INSTALLREPO = 'http://www-uxsup.csx.cam.ac.uk/pub/linux/ubuntu'
+PRESEEDLOCATION = 'http://git.dtg.cl.cam.ac.uk/?p=husky/preseed.git;a=blob_plain;f=puppy-preseed.cfg;hb=HEAD'
 
 # Filesystem
 DEFAULTROOTFSSIZE = '8'
 DEFAULTDATAFSSIZE = '1'
-SR                = '53a849fd-d3a0-7857-bb9c-302871a45127'
+SR = '53a849fd-d3a0-7857-bb9c-302871a45127'
 
 # Networking
-NETWORK           = '77922c07-8ea4-abb2-708b-4719f4c6a0f8'
-DEVICE            = '0'
+NETWORK = '77922c07-8ea4-abb2-708b-4719f4c6a0f8'
+DEVICE = '0'
 
 # System
-DEFAULTVCPUs      = '1'
-DEFAULTMINMEMORY  = '256'
-DEFAULTMAXMEMORY  = '512'
+DEFAULTVCPUs = '1'
+DEFAULTMINMEMORY = '256'
+DEFAULTMAXMEMORY = '512'
 
 # Template
-TEMPLATENAME      = 'DTG-template'
+TEMPLATENAME = 'DTG-template'
 
 # SSH
-SSHUSER           = 'root'
+SSHUSER = 'root'
 
 def valid_ip(address):
     parts = address.split(".")
