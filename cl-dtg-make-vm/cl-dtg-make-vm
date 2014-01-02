@@ -1,8 +1,7 @@
 #! /usr/bin/env python2.7
 
-from fabric.api import *
-import sys, argparse, subprocess, socket, getpass
-from datetime import date
+from fabric.api import run, hosts, output, env, execute, settings
+import sys, argparse, socket, getpass
 from time import sleep
 
 dhcp = 'dhcp.dtg.cl.cam.ac.uk'
