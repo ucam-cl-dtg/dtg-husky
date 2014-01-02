@@ -179,7 +179,7 @@ def ip_to_mac(ip):
     return mac
 
 
-@hosts(DOM0)
+@hosts(DHCP)
 def macs_in_pool():
     return run('grep "hardware ethernet" /etc/dhcp/dhcpd.hosts | sed -e \'s/.*ethernet //\' -e \'s/;//\'').upper()
 
