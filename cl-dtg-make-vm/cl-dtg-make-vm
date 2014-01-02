@@ -4,8 +4,8 @@ from fabric.api import run, hosts, output, env, execute, settings
 import sys, argparse, socket, getpass
 from time import sleep
 
-dhcp = 'dhcp.dtg.cl.cam.ac.uk'
-dom0 = 'root@husky0.dtg.cl.cam.ac.uk'
+DHCP = 'dhcp.dtg.cl.cam.ac.uk'
+DOM0 = 'root@husky0.dtg.cl.cam.ac.uk'
 
 # OS
 TEMPLATE          = '115a8d15-a73d-85bb-09df-103768ed36ee'
@@ -42,7 +42,7 @@ def validIP(address):
             return False
     return True
 
-@hosts(dom0)
+@hosts(DOM0)
 def check_name(name):
     duplicate_name = run('xe vm-list name-label=%s' % name).strip()
     if duplicate_name:
@@ -74,7 +74,7 @@ def new_vm(name, mac, memory, vcpus, root_fs_size, fs_location=SR, **kwargs):
         mac = next_mac()
     execute(host_build_vm, name, mac, memory, vcpus, root_fs_size, fs_location)
 
-@hosts(dom0)
+@hosts(DOM0)
 def host_build_vm(name, mac, memory, vcpus, root_fs_size, fs_location):
     # Create a VM
     new_vm = run('xe vm-install new-name-label=%s template=%s sr-uuid=%s' % (name, TEMPLATE, fs_location))
@@ -119,7 +119,7 @@ def new_cloned_vm(name, ip, mac, memory, vcpus, root_fs_size, data_size, data_SR
         mac = next_mac()
     execute(host_build_cloned_vm, name, mac, memory, vcpus, root_fs_size, data_size, data_SR)
 
-@hosts(dom0)
+@hosts(DOM0)
 def host_build_cloned_vm(name, mac, memory, vcpus, root_fs_size, data_size, data_SR):
     # Create VM from snapshot
     run('xe vm-clone new-name-label=%s vm=%s' % (name, TEMPLATENAME))
@@ -160,7 +160,7 @@ def host_build_cloned_vm(name, mac, memory, vcpus, root_fs_size, data_size, data
     run('nohup ssh -n -f -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no %s@%s "/etc/rc2.d/S76vm-boot; sudo apt-get update; cd /etc/puppet-bare; sudo git fetch -f git://github.com/ucam-cl-dtg/dtg-puppet.git master:master; nohup sudo bash /etc/puppet-bare/hooks/post-update >/var/log/puppet/install-log 2>&1"' % (SSHUSER, dns_name))
 
 
-@hosts(dhcp)
+@hosts(DOM0)
 def ip_to_mac(ip):
     """
     Convert an IP address to a MAC address by searching our DHCP config.
@@ -171,11 +171,11 @@ def ip_to_mac(ip):
     mac = run('grep -B 1 %s /etc/dhcpd.conf | grep ethernet | sed -e \'s/.*net //\' -e \'s/;//\'' % ip)
     return mac
 
-@hosts(dhcp)
+@hosts(DOM0)
 def macs_in_pool():
     return run('grep "hardware ethernet" /etc/dhcp/dhcpd.hosts | sed -e \'s/.*ethernet //\' -e \'s/;//\'').upper()
 
-@hosts(dom0)
+@hosts(DOM0)
 def dom0_macs():
     return run('xe vif-list params=MAC | sed -e \'/^$/d\' -e \'s/.*: //\'').upper()
 
