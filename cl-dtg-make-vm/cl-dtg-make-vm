@@ -35,6 +35,7 @@ TEMPLATENAME = 'DTG-template'
 # SSH
 SSHUSER = 'root'
 
+
 def valid_ip(address):
     parts = address.split(".")
     if len(parts) != 4:
@@ -44,12 +45,14 @@ def valid_ip(address):
             return False
     return True
 
+
 @hosts(DOM0)
 def check_name(name):
     duplicate_name = run('xe vm-list name-label=%s' % name).strip()
     if duplicate_name:
         sys.stderr.write('Duplicate VM name: %s. You might wish to use cl-dtg-rm-vm.' % name)
         sys.exit(1)
+
 
 def prepare_vm(mac, uuid, memory, vcpus):
     """
@@ -74,7 +77,8 @@ def new_vm(name, mac, memory, vcpus, root_fs_size, fs_location=SR, **kwargs):
     execute(check_name, name)
     if mac == None:
         mac = next_mac()
-    execute(host_build_vm, name, mac, memory, vcpus, root_fs_size, fs_location)
+        execute(host_build_vm, name, mac, memory, vcpus, root_fs_size, fs_location)
+
 
 @hosts(DOM0)
 def host_build_vm(name, mac, memory, vcpus, root_fs_size, fs_location):
@@ -120,6 +124,7 @@ def new_cloned_vm(name, ip, mac, memory, vcpus, root_fs_size, data_size, data_SR
     if mac == None:
         mac = next_mac()
     execute(host_build_cloned_vm, name, mac, memory, vcpus, root_fs_size, data_size, data_SR)
+
 
 @hosts(DOM0)
 def host_build_cloned_vm(name, mac, memory, vcpus, root_fs_size, data_size, data_SR):
@@ -173,13 +178,16 @@ def ip_to_mac(ip):
     mac = run('grep -B 1 %s /etc/dhcpd.conf | grep ethernet | sed -e \'s/.*net //\' -e \'s/;//\'' % ip)
     return mac
 
+
 @hosts(DOM0)
 def macs_in_pool():
     return run('grep "hardware ethernet" /etc/dhcp/dhcpd.hosts | sed -e \'s/.*ethernet //\' -e \'s/;//\'').upper()
 
+
 @hosts(DOM0)
 def dom0_macs():
     return run('xe vif-list params=MAC | sed -e \'/^$/d\' -e \'s/.*: //\'').upper()
+
 
 def next_mac():
     """
