@@ -64,7 +64,7 @@ def prepare_vm(mac, uuid, memory, vcpus):
 
     # Give the VM enough memory, and VCPU
     run('xe vm-param-set uuid=%s VCPUs-max=%s' % (uuid, vcpus))
-    run('xe vm-param-set uuid=%s  VCPUs-at-startup=%s'  % (uuid, vcpus))
+    run('xe vm-param-set uuid=%s  VCPUs-at-startup=%s' % (uuid, vcpus))
 
     run('xe vm-memory-limits-set uuid=%s dynamic-max=%sMiB static-max=%sMiB static-min=%sMiB dynamic-min=%sMiB' % (uuid, memory, memory, DEFAULTMINMEMORY, DEFAULTMINMEMORY))
 
@@ -162,7 +162,7 @@ def host_build_cloned_vm(name, mac, memory, vcpus, root_fs_size, data_size, data
     run('xe vm-param-set name-description="%s" uuid=%s' % (dns_name, new_vm))
 
     with settings(warn_only=True):
-        while run('ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  %s@%s "sudo sh -c \'echo %s > /etc/hostname ; sudo start hostname \'"'  % (SSHUSER, dns_name, name)) == '1':
+        while run('ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  %s@%s "sudo sh -c \'echo %s > /etc/hostname ; sudo start hostname \'"' % (SSHUSER, dns_name, name)) == '1':
             sleep(1)
     run('nohup ssh -n -f -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no %s@%s "/etc/rc2.d/S76vm-boot; sudo apt-get update; cd /etc/puppet-bare; sudo git fetch -f git://github.com/ucam-cl-dtg/dtg-puppet.git master:master; nohup sudo bash /etc/puppet-bare/hooks/post-update >/var/log/puppet/install-log 2>&1"' % (SSHUSER, dns_name))
 
@@ -193,8 +193,8 @@ def next_mac():
     """
     Finds a MAC address that is not currently assigned to a VM.
     """
-    dhcp_macs = [ x.strip() for x in execute(macs_in_pool).values()[0].split("\r\n") ]
-    assigned_macs = [ x.strip() for x in execute(dom0_macs).values()[0].split("\r\n") ]
+    dhcp_macs = [x.strip() for x in execute(macs_in_pool).values()[0].split("\r\n")]
+    assigned_macs = [x.strip() for x in execute(dom0_macs).values()[0].split("\r\n")]
     return ((set(dhcp_macs) - set(assigned_macs)).pop())
 
 
