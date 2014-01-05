@@ -16,6 +16,11 @@ def find_vm_ip(name):
     """
 
     vm_uuid = run("xe vm-list params=uuid name-label=%s --minimal" % name)
+    if not vm_uuid:
+        abort("No such vm: %s" % name)
+    vm_interfaces = run('xe vif-list vm-uuid=%s --minimal' % vm_uuid)
+    if not vm_interfaces:
+        abort("No network interfaces found for %s" % (name))
     vm_ip = run("xe vm-param-get param-name=networks uuid=%s param-key=0/ip" % vm_uuid)
     return vm_ip
 
