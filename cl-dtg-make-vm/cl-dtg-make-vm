@@ -77,7 +77,7 @@ def new_vm(name, mac, memory, vcpus, root_fs_size, fs_location=SR, **kwargs):
     execute(check_name, name)
     if mac is None:
         mac = next_mac()
-        execute(host_build_vm, name, mac, memory, vcpus, root_fs_size, fs_location)
+    execute(host_build_vm, name, mac, memory, vcpus, root_fs_size, fs_location)
 
 
 @hosts(DOM0)
