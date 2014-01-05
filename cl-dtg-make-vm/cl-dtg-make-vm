@@ -1,40 +1,42 @@
 #! /usr/bin/env python2.7
 
-from fabric.api import *
-import sys, argparse, subprocess, socket, getpass
-from datetime import date
+from fabric.api import run, hosts, output, env, execute, settings
+import sys
+import argparse
+import socket
+import getpass
 from time import sleep
 
-dhcp = 'dhcp.dtg.cl.cam.ac.uk'
-dom0 = 'root@husky0.dtg.cl.cam.ac.uk'
+DHCP = 'dhcp.dtg.cl.cam.ac.uk'
+DOM0 = 'root@husky0.dtg.cl.cam.ac.uk'
 
 # OS
-TEMPLATE          = '115a8d15-a73d-85bb-09df-103768ed36ee'
-INSTALLREPO       = 'http://www-uxsup.csx.cam.ac.uk/pub/linux/ubuntu'
-PRESEEDLOCATION   = 'http://git.dtg.cl.cam.ac.uk/?p=husky/preseed.git;a=blob_plain;f=puppy-preseed.cfg;hb=HEAD'
+TEMPLATE = '115a8d15-a73d-85bb-09df-103768ed36ee'
+INSTALLREPO = 'http://www-uxsup.csx.cam.ac.uk/pub/linux/ubuntu'
+PRESEEDLOCATION = 'http://git.dtg.cl.cam.ac.uk/?p=husky/preseed.git;a=blob_plain;f=puppy-preseed.cfg;hb=HEAD'
 
 # Filesystem
 DEFAULTROOTFSSIZE = '8'
 DEFAULTDATAFSSIZE = '1'
-DEFAULTSR         = 'NFS\ virtual\ disk\ storage'
-SR                = '53a849fd-d3a0-7857-bb9c-302871a45127'
+SR = '53a849fd-d3a0-7857-bb9c-302871a45127'
 
 # Networking
-NETWORK           = '77922c07-8ea4-abb2-708b-4719f4c6a0f8'
-DEVICE            = '0'
+NETWORK = '77922c07-8ea4-abb2-708b-4719f4c6a0f8'
+DEVICE = '0'
 
 # System
-DEFAULTVCPUs      = '1'
-DEFAULTMINMEMORY  = '256'
-DEFAULTMAXMEMORY  = '512'
+DEFAULTVCPUs = '1'
+DEFAULTMINMEMORY = '256'
+DEFAULTMAXMEMORY = '512'
 
 # Template
-TEMPLATENAME      = 'DTG-template'
+TEMPLATENAME = 'DTG-template'
 
 # SSH
-SSHUSER           = 'root'
+SSHUSER = 'root'
 
-def validIP(address):
+
+def valid_ip(address):
     parts = address.split(".")
     if len(parts) != 4:
         return False
@@ -43,12 +45,14 @@ def validIP(address):
             return False
     return True
 
-@hosts(dom0)
+
+@hosts(DOM0)
 def check_name(name):
     duplicate_name = run('xe vm-list name-label=%s' % name).strip()
     if duplicate_name:
         sys.stderr.write('Duplicate VM name: %s. You might wish to use cl-dtg-rm-vm.' % name)
         sys.exit(1)
+
 
 def prepare_vm(mac, uuid, memory, vcpus):
     """
@@ -60,7 +64,7 @@ def prepare_vm(mac, uuid, memory, vcpus):
 
     # Give the VM enough memory, and VCPU
     run('xe vm-param-set uuid=%s VCPUs-max=%s' % (uuid, vcpus))
-    run('xe vm-param-set uuid=%s  VCPUs-at-startup=%s'  % (uuid,vcpus))
+    run('xe vm-param-set uuid=%s  VCPUs-at-startup=%s' % (uuid, vcpus))
 
     run('xe vm-memory-limits-set uuid=%s dynamic-max=%sMiB static-max=%sMiB static-min=%sMiB dynamic-min=%sMiB' % (uuid, memory, memory, DEFAULTMINMEMORY, DEFAULTMINMEMORY))
 
@@ -71,11 +75,12 @@ def new_vm(name, mac, memory, vcpus, root_fs_size, fs_location=SR, **kwargs):
     """
 
     execute(check_name, name)
-    if mac == None:
+    if mac is None:
         mac = next_mac()
-    execute(host_build_vm, name, mac, memory, vcpus, root_fs_size, fs_location)
+        execute(host_build_vm, name, mac, memory, vcpus, root_fs_size, fs_location)
 
-@hosts(dom0)
+
+@hosts(DOM0)
 def host_build_vm(name, mac, memory, vcpus, root_fs_size, fs_location):
     # Create a VM
     new_vm = run('xe vm-install new-name-label=%s template=%s sr-uuid=%s' % (name, TEMPLATE, fs_location))
@@ -114,13 +119,14 @@ def new_cloned_vm(name, ip, mac, memory, vcpus, root_fs_size, data_size, data_SR
     """
     execute(check_name, name)
 
-    if ip != None:
+    if ip is not None:
         mac = execute(ip_to_mac, ip)
-    if mac == None:
+    if mac is None:
         mac = next_mac()
     execute(host_build_cloned_vm, name, mac, memory, vcpus, root_fs_size, data_size, data_SR)
 
-@hosts(dom0)
+
+@hosts(DOM0)
 def host_build_cloned_vm(name, mac, memory, vcpus, root_fs_size, data_size, data_SR):
     # Create VM from snapshot
     run('xe vm-clone new-name-label=%s vm=%s' % (name, TEMPLATENAME))
@@ -153,8 +159,8 @@ def host_build_cloned_vm(name, mac, memory, vcpus, root_fs_size, data_size, data
 
     # SSH into the new machine, and set the hostname. First wait for the m/c to boot
 
-    ip=""
-    while not validIP(ip):
+    ip = ""
+    while not valid_ip(ip):
         ip = run('xe vm-param-get param-name=networks uuid=%s | sed -e \'s_0/ip: __\' -e \'s/; .*$//\'' % new_vm)
         sleep(1)
 
@@ -164,36 +170,39 @@ def host_build_cloned_vm(name, mac, memory, vcpus, root_fs_size, data_size, data
     run('xe vm-param-set name-description="%s" uuid=%s' % (dns_name, new_vm))
 
     with settings(warn_only=True):
-        while run('ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  %s@%s "sudo sh -c \'echo %s > /etc/hostname ; sudo start hostname \'"'  % (SSHUSER, dns_name, name)) == '1':
+        while run('ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  %s@%s "sudo sh -c \'echo %s > /etc/hostname ; sudo start hostname \'"' % (SSHUSER, dns_name, name)) == '1':
             sleep(1)
     run('nohup ssh -n -f -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no %s@%s "/etc/rc2.d/S76vm-boot; sudo apt-get update; cd /etc/puppet-bare; sudo git fetch -f git://github.com/ucam-cl-dtg/dtg-puppet.git master:master; nohup sudo bash /etc/puppet-bare/hooks/post-update >/var/log/puppet/install-log 2>&1"' % (SSHUSER, dns_name))
 
 
-@hosts(dhcp)
+@hosts(DOM0)
 def ip_to_mac(ip):
     """
     Convert an IP address to a MAC address by searching our DHCP config.
     """
     if ip == "":
-        return "";
+        return ""
 
     mac = run('grep -B 1 %s /etc/dhcpd.conf | grep ethernet | sed -e \'s/.*net //\' -e \'s/;//\'' % ip)
     return mac
 
-@hosts(dhcp)
+
+@hosts(DHCP)
 def macs_in_pool():
     return run('grep "hardware ethernet" /etc/dhcp/dhcpd.hosts | sed -e \'s/.*ethernet //\' -e \'s/;//\'').upper()
 
-@hosts(dom0)
+
+@hosts(DOM0)
 def dom0_macs():
     return run('xe vif-list params=MAC | sed -e \'/^$/d\' -e \'s/.*: //\'').upper()
+
 
 def next_mac():
     """
     Finds a MAC address that is not currently assigned to a VM.
     """
-    dhcp_macs = [ x.strip() for x in execute(macs_in_pool).values()[0].split("\r\n") ]
-    assigned_macs = [ x.strip() for x in execute(dom0_macs).values()[0].split("\r\n") ]
+    dhcp_macs = [x.strip() for x in execute(macs_in_pool).values()[0].split("\r\n")]
+    assigned_macs = [x.strip() for x in execute(dom0_macs).values()[0].split("\r\n")]
     return ((set(dhcp_macs) - set(assigned_macs)).pop())
 
 
@@ -209,7 +218,7 @@ if __name__ == '__main__':
     # We don't want both an IP address and MAC
     ip_mac_group = parser.add_mutually_exclusive_group()
     ip_mac_group.add_argument('-i', '--ip', help='The created VM will be given a MAC address that will be offered this value by DHCP')
-    ip_mac_group.add_argument('-M', '--mac', help='MAC address to assign the VM\s VIF')
+    ip_mac_group.add_argument('-M', '--mac', help='MAC address to assign the VM\'s VIF')
 
     # Optional args
     parser.add_argument('-m', '--memory', default=DEFAULTMAXMEMORY, type=int, help='memory (in MB) assigned to VM')
