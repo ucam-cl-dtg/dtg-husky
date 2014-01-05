@@ -49,8 +49,8 @@ def rm_vm(name):
     run('xe vm-uninstall vm="%s" force=true' % (name))
 
     for uuid in vdi_uuids.strip().split(","):
-        vdi_check = run('xe vdi-list uuid=%s' % (uuid)).strip()
-        if (vdi_check == uuid):
+        vdi_still_exists = run('xe vdi-list uuid=%s --minimal params=uuid' % (uuid)).strip()
+        if (vdi_still_exists == uuid):
             run('xe vdi-destroy uuid=%s' % (uuid))
 
 if __name__ == '__main__':
