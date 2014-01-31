@@ -10,7 +10,7 @@ dom0 = 'husky0.dtg.cl.cam.ac.uk'
 env.user = "root"
 
 @hosts(dom0)
-def rm_vm(name):
+def rm_vm(name,force):
     """
     Destroy an existing VM.
     """
@@ -27,7 +27,11 @@ def rm_vm(name):
     uuid = uuids[0]
 
     # Check that this domain is deletable
-    deletable_by = run('xe vm-param-get uuid=%s param-name=other-config param-key=XenCenter.CustomFields.deletable-by' % (uuid)).strip()
+    if force:
+        deletable_by = "all"
+    else:
+        deletable_by = run('xe vm-param-get uuid=%s param-name=other-config param-key=XenCenter.CustomFields.deletable-by' % (uuid)).strip()
+
     if deletable_by == "none":
         abort('Cannot delete VM - it is set to be not deletable (other-config:XenCenter.CustomFields.deletable-by == "none")')
     elif deletable_by == "owner":
@@ -49,8 +53,8 @@ def rm_vm(name):
     run('xe vm-uninstall vm="%s" force=true' % (name))
 
     for uuid in vdi_uuids.strip().split(","):
-        vdi_check = run('xe vdi-list uuid=%s' % (uuid)).strip()
-        if (vdi_check == uuid):
+        vdi_still_exists = run('xe vdi-list uuid=%s --minimal params=uuid' % (uuid)).strip()
+        if (vdi_still_exists == uuid):
             run('xe vdi-destroy uuid=%s' % (uuid))
 
 if __name__ == '__main__':
@@ -61,6 +65,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Destroy a VM on the DTG husky cluster. This script removes the VM and deletes all its storage devices')
 
     parser.add_argument('name', help='The name of the VM')
-
+    parser.add_argument('--force', action='store_const', const=True, default=False, help='Force delete even if VM is not deleteable by this user (or if the information is not set)')
     parsed_args = vars(parser.parse_args())
     execute(rm_vm, **parsed_args)
