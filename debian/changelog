@@ -1,3 +1,31 @@
+cl-dtg-make-vm (0.0.20ubuntu1) UNRELEASED; urgency=low
+
+  [ Oliver Chick ]
+  * Major refactor of find vm.
+  * Add a third disk for swap.
+  * Add a third disk for swap.
+  * Tidy up imports.
+  * Constants in uppercase
+  * Remove unused constant
+  * s/validIP/valid_ip
+  * No semantic change. Minor cleanup of syntax
+  * One import statement per line
+  * No semantic change. Removed whitespace around = signs for allignment as per E221.
+  * Two blank lines between top level fns
+  * Prefer is None to == None
+  * Remove excessive whitespace
+  * Fix bug introduced in 2d7c0c where dhcp addresses were fetched from dom0 rather than dhcp
+  * Build  a VM if mac is not NULL.
+  * Add error checking that was removed in  7dda3ffc
+
+  [ Andrew Rice ]
+  * Added a --force flag which will delete a VM even if the deleteable-by info is missing or would prevent it
+  * Fixed broken check for an existing vdi.  The wrong xe call was being made and so we always thought it returned false.
+
+  [ Oliver Chick ]
+
+ -- Oliver Chick <oliver.chick--dtg-git@cl.cam.ac.uk>  Fri, 31 Jan 2014 14:06:44 +0000
+
 cl-dtg-make-vm (0.0.20) raring; urgency=low
 
   * Tell fabric to get usernames from .ssh/config
