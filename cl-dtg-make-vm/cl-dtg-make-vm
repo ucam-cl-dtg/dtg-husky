@@ -25,6 +25,7 @@ NETWORK = '77922c07-8ea4-abb2-708b-4719f4c6a0f8'
 DEVICE = '0'
 
 # System
+MAXVCPUS = '8'
 DEFAULTVCPUs = '1'
 DEFAULTMINMEMORY = '256'
 DEFAULTMAXMEMORY = '512'
@@ -63,7 +64,7 @@ def prepare_vm(mac, uuid, memory, vcpus):
     run('xe vif-create network-uuid=%s mac=%s vm-uuid=%s device=%s' % (NETWORK, mac, uuid, DEVICE))
 
     # Give the VM enough memory, and VCPU
-    run('xe vm-param-set uuid=%s VCPUs-max=%s' % (uuid, vcpus))
+    run('xe vm-param-set uuid=%s VCPUs-max=%s' % (uuid, MAXVCPUS))
     run('xe vm-param-set uuid=%s  VCPUs-at-startup=%s' % (uuid, vcpus))
 
     run('xe vm-memory-limits-set uuid=%s dynamic-max=%sMiB static-max=%sMiB static-min=%sMiB dynamic-min=%sMiB' % (uuid, memory, memory, DEFAULTMINMEMORY, DEFAULTMINMEMORY))
