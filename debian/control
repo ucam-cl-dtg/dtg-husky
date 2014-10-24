@@ -11,7 +11,7 @@ X-Python-Version: >= 2.6
 Package: cl-dtg-make-vm
 Architecture: all
 Section: python
-Depends: fabric
+Depends: fabric python-git
 Description: Scripts for doing magic with VMs in the DTG husky cluster:
  -A script to create a puppy
  -A script to put live puppies in the DMZ
