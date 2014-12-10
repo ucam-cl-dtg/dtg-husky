@@ -8,7 +8,7 @@ from cStringIO import StringIO
 from fabric.api import *
 import sys
 import xenhelpers
-
+import clhelpers
 
 DMZ_NETWORK = 'DMZ vlan'
 
@@ -95,7 +95,11 @@ def main(args):
     execute(set_static_network, args, hosts=[args.ssh_address])
     prompt('Static config written to /etc/network/interfaces. Replacing VIF.')
     execute(remove_vifs, vmuuid, hosts=[xenhelpers.DOM0_HOST])
-    execute(create_dmz_vif, vmuuid, networkuuid, args.mac, hosts=[xenhelpers.DOM0_HOST])
+    if (args.mac):
+        mac = args.mac
+    else:
+        mac = clhelper.ip_to_mac(args.ip)        
+    execute(create_dmz_vif, vmuuid, networkuuid, mac, hosts=[xenhelpers.DOM0_HOST])
     print('All done. Your server should now exist on public IP %s.' % args.ip)
 
 
@@ -105,7 +109,7 @@ if __name__ == '__main__':
     parser.add_argument('--vm', required=True, help='Substring of the name-label or uuid of the VM on Xen. Specify enough to make it unambiguous.')
     parser.add_argument('--ssh-address', required=True, help='IP or hostname where to ssh into this VM currently.')
     # New config
-    parser.add_argument('--mac', type=xenhelpers.macaddress, required=True, help='MAC address on the DMZ. Get this from the CL sysadmins.')
+    parser.add_argument('--mac', type=xenhelpers.macaddress, required=False, help='MAC address on the DMZ. Get this from the CL sysadmins.')
     parser.add_argument('--ip', type=xenhelpers.ipaddress, required=True, help='IP address on the DMZ. Get this from the CL sysadmins.')
     parser.add_argument('--gateway', type=xenhelpers.ipaddress, required=True, help='Gateway on the DMZ. Get this from the CL sysadmins.')
     parser.add_argument('--netmask', type=xenhelpers.ipaddress, default='255.255.255.0', help='Netmask on the DMZ. Get this from the CL sysadmins.')
