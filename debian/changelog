@@ -1,3 +1,15 @@
+cl-dtg-make-vm (0.0.22) utopic; urgency=medium
+
+  * Allow VCPU hotplug up to 8 VCPUs
+  * Rely on python-git
+  * Update template UUID
+  * Fix template UUID.
+  * Improve formatting. No semantic change.
+  * Only assign virtual macs to virtual machines.
+  * v0.0.21
+
+ -- Oliver Chick <oliver.chick--dtg-git@cl.cam.ac.uk>  Mon, 15 Dec 2014 17:37:50 +0000
+
 cl-dtg-make-vm (0.0.21ubuntu1) utopic; urgency=low
 
   [ Oliver Chick ]
