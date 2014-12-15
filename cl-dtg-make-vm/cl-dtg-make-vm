@@ -209,7 +209,7 @@ def ip_to_mac(ip):
 
 @hosts(DHCP)
 def macs_in_pool():
-    return run('grep "hardware ethernet" /etc/dhcp/dhcpd.hosts | sed -e \'s/.*ethernet //\' -e \'s/;//\'').upper()
+    return run('grep "hardware ethernet   00:16:3E" /etc/dhcp/dhcpd.hosts | sed -e \'s/.*ethernet //\' -e \'s/;//\'').upper()
 
 
 @hosts(DOM0)
