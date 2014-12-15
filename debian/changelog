@@ -1,4 +1,4 @@
-cl-dtg-make-vm (0.0.20ubuntu1) UNRELEASED; urgency=low
+cl-dtg-make-vm (0.0.21ubuntu1) utopic; urgency=low
 
   [ Oliver Chick ]
   * Major refactor of find vm.
@@ -23,8 +23,13 @@ cl-dtg-make-vm (0.0.20ubuntu1) UNRELEASED; urgency=low
   * Fixed broken check for an existing vdi.  The wrong xe call was being made and so we always thought it returned false.
 
   [ Oliver Chick ]
+  * Allow VCPU hotplug up to 8 VCPUs
+  * Update template UUID
+  * Fix template UUID.
+  * Improve formatting. No semantic change.
+  * Only assign virtual macs to virtual machines.
 
- -- Oliver Chick <oliver.chick--dtg-git@cl.cam.ac.uk>  Fri, 31 Jan 2014 14:06:44 +0000
+ -- Oliver Chick <oc243@cl.cam.ac.uk>  Mon, 15 Dec 2014 17:25:08 +0000
 
 cl-dtg-make-vm (0.0.20) raring; urgency=low
 
