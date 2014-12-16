@@ -1,3 +1,13 @@
+cl-dtg-make-vm (0.0.23) utopic; urgency=medium
+
+  [ Thomas Bytheway ]
+  * Cleanup of cl-dtg-make-vm
+
+  [ Oliver Chick ]
+  * Add missing , that broke builds.
+
+ -- Oliver Chick <oc243@cl.cam.ac.uk>  Tue, 16 Dec 2014 19:29:52 +0000
+
 cl-dtg-make-vm (0.0.22) utopic; urgency=medium
 
   * Allow VCPU hotplug up to 8 VCPUs
