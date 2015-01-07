@@ -11,7 +11,7 @@ DHCP = 'dhcp.dtg.cl.cam.ac.uk'
 DOM0 = 'root@husky0.dtg.cl.cam.ac.uk'
 
 # OS
-TEMPLATE = '1dcc6f59-e78c-4fef-dfce-596d3fa784f6'
+TEMPLATE = '52a2ef78-259d-24c9-1fb7-62922f7b1904'
 INSTALLREPO = 'http://www-uxsup.csx.cam.ac.uk/pub/linux/ubuntu'
 PRESEEDLOCATION = ('http://git.dtg.cl.cam.ac.uk/?p=husky/preseed.git;'
                    'a=blob_plain;f=puppy-preseed.cfg;hb=HEAD')
@@ -89,8 +89,9 @@ def new_vm(name, mac, memory, vcpus, root_fs_size, fs_location=SR, **_):
 @hosts(DOM0)
 def host_build_vm(name, mac, memory, vcpus, root_fs_size, fs_location):
     # Create a VM
-    new_vm_id = run('xe vm-install new-name-label=%s sr-uuid=%s' %
-                    (name, fs_location))
+    new_vm_id = run('xe vm-install new-name-label=%s '
+                    'sr-uuid=%s template-uuid=%s' %
+                    (name, fs_location, TEMPLATE))
 
     # Point VM at install repo
     run('xe vm-param-set uuid=%s other-config:install-repository=%s' %
