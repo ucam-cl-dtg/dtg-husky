@@ -11,7 +11,7 @@ DHCP = 'dhcp.dtg.cl.cam.ac.uk'
 DOM0 = 'root@husky0.dtg.cl.cam.ac.uk'
 
 # OS
-TEMPLATE = '52a2ef78-259d-24c9-1fb7-62922f7b1904'
+TEMPLATE = 'e9c52527-767a-6b91-c331-94d9a97f3de9'
 INSTALLREPO = 'http://www-uxsup.csx.cam.ac.uk/pub/linux/ubuntu'
 PRESEEDLOCATION = ('http://git.dtg.cl.cam.ac.uk/?p=husky/preseed.git;'
                    'a=blob_plain;f=puppy-preseed.cfg;hb=HEAD')
@@ -22,7 +22,7 @@ DEFAULTDATAFSSIZE = '1'
 SR = '53a849fd-d3a0-7857-bb9c-302871a45127'
 
 # Networking
-NETWORK = '77922c07-8ea4-abb2-708b-4719f4c6a0f8'
+NETWORK = 'e9c52527-767a-6b91-c331-94d9a97f3de9'
 DEVICE = '0'
 
 # System
@@ -115,7 +115,8 @@ def host_build_vm(name, mac, memory, vcpus, root_fs_size, fs_location):
 
     # Set the preseed file, and pass a hostname, and password hash
     run('xe vm-param-set uuid=%s PV-args=" --quiet console=hvc0 auto=true '
-        'url=%s netcfg/get_hostname=%s"' % (new_vm_id, PRESEEDLOCATION, name))
+        'url=%s netcfg/get_hostname=%s xen.fifo_events=0"' %
+        (new_vm_id, PRESEEDLOCATION, name))
 
     prepare_vm(mac, new_vm_id, memory, vcpus)
 
