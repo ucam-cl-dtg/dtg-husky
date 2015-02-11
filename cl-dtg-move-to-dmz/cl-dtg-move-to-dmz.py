@@ -111,7 +111,7 @@ if __name__ == '__main__':
     # New config
     parser.add_argument('--mac', type=xenhelpers.macaddress, required=False, help='MAC address on the DMZ. Get this from the CL sysadmins.')
     parser.add_argument('--ip', type=xenhelpers.ipaddress, required=True, help='IP address on the DMZ. Get this from the CL sysadmins.')
-    parser.add_argument('--gateway', type=xenhelpers.ipaddress, required=True, help='Gateway on the DMZ. Get this from the CL sysadmins.')
+    parser.add_argument('--gateway', type=xenhelpers.ipaddress, help='Gateway on the DMZ. Get this from the CL sysadmins.', default='128.232.98.1')
     parser.add_argument('--netmask', type=xenhelpers.ipaddress, default='255.255.255.0', help='Netmask on the DMZ. Get this from the CL sysadmins.')
     parser.add_argument('--nameserver', type=xenhelpers.ipaddress, action='append', default=xenhelpers.DefaultList(['128.232.1.1', '128.232.1.2', '128.232.1.3']),
                         help='Nameservers on the DMZ. Usually standard CL nameservers.')
