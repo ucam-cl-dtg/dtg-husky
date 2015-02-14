@@ -1,5 +1,23 @@
-cl-dtg-make-vm (0.0.22) UNRELEASED; urgency=medium
+cl-dtg-make-vm (0.0.24) utopic; urgency=medium
 
+  * Fix VM creation from template.
+  * Fix UUIDS, and stop fifo events breaking 14.10
+  * Update template UUID for XS6.5
+
+ -- Oliver Chick <oc243@cl.cam.ac.uk>  Sat, 14 Feb 2015 15:15:35 +0000
+
+cl-dtg-make-vm (0.0.23) utopic; urgency=medium
+
+  [ Thomas Bytheway ]
+  * Cleanup of cl-dtg-make-vm
+
+  [ Oliver Chick ]
+  * Add missing , that broke builds.
+
+ -- Oliver Chick <oc243@cl.cam.ac.uk>  Tue, 16 Dec 2014 19:29:52 +0000
+
+cl-dtg-make-vm (0.0.22) utopic; urgency=medium
+2
   * Allow VCPU hotplug up to 8 VCPUs
   * Rely on python-git
   * Update template UUID
