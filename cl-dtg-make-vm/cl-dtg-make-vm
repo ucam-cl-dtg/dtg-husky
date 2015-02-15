@@ -209,7 +209,7 @@ def host_build_cloned_vm(name, mac, memory, vcpus,
             sleep(1)
     run('nohup ssh -n -f -o UserKnownHostsFile=/dev/null -o '
         'StrictHostKeyChecking=no %s@%s "/etc/rc2.d/S76vm-boot; '
-        'sudo apt-get update; cd /etc/puppet-bare; sudo git fetch -f '
+        'cd /etc/puppet-bare; sudo git fetch -f '
         'git://github.com/ucam-cl-dtg/dtg-puppet.git master:master; '
         'nohup sudo bash /etc/puppet-bare/hooks/post-update '
         '>/var/log/puppet/install-log 2>&1"' %
