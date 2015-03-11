@@ -231,14 +231,15 @@ def ip_to_mac(ip):
 
 @hosts(DHCP)
 def macs_in_pool():
-    return run('grep "hardware ethernet   00:16:3E" /etc/dhcp/dhcpd.hosts | '
+    return run('grep "hardware ethernet   00:16:3E:E8" /etc/dhcp/dhcpd.hosts | '
                'sed -e \'s/.*ethernet //\' -e \'s/;//\'').upper()
 
 
 @hosts(DOM0)
 def dom0_macs():
-    return run('xe vif-list params=MAC | '
-               'sed -e \'/^$/d\' -e \'s/.*: //\'').upper()
+    return run(r"(for i in $(xe vm-list is-a-snapshot=false params=uuid --minimal | "
+               r"sed 's/,/ /g'); do xe vif-list params=MAC vm-uuid=$i --minimal; "
+               r"done) | sed 's/,/\n/g' | tr 'a-z' 'A-Z' | grep '00:16:3E:E8'").upper()
 
 
 def next_mac():
