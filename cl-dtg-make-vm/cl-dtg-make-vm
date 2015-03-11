@@ -237,8 +237,8 @@ def macs_in_pool():
 
 @hosts(DOM0)
 def dom0_macs():
-    return run(r"(for i in `xe vm-list is-a-snapshot=false params=uuid --minimal | "
-               r"sed 's/,/ /g'`; do xe vif-list params=MAC vm-uuid=$i --minimal; "
+    return run(r"(for i in $(xe vm-list is-a-snapshot=false params=uuid --minimal | "
+               r"sed 's/,/ /g'); do xe vif-list params=MAC vm-uuid=$i --minimal; "
                r"done) | sed 's/,/\n/g' | tr 'a-z' 'A-Z' | grep '00:16:3E:E8'").upper()
 
 
