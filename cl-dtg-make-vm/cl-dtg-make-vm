@@ -249,7 +249,7 @@ def host_build_cloned_vm(name, mac, memory, vcpus,
         (SSHUSER, dns_name))
 
 
-@hosts(DOM0)
+@hosts(DHCP)
 def ip_to_mac(ip):
     """
     Convert an IP address to a MAC address by searching our DHCP config.
@@ -257,7 +257,7 @@ def ip_to_mac(ip):
     if ip == "":
         return ""
 
-    mac = run('grep -B 1 %s /etc/dhcpd.conf | grep ethernet | '
+    mac = run('grep -B 1 %s /etc/dhcp/dhcpd.hosts | grep ethernet | '
               'sed -e \'s/.*net //\' -e \'s/;//\'' % ip)
     return mac
 
