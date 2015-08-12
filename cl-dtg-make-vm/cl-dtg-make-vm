@@ -1,10 +1,14 @@
 #! /usr/bin/env python2.7
 
 from fabric.api import run, hosts, output, env, execute, settings
-import sys
+from email.mime.text import MIMEText
+from jinja2 import Template, Environment
 import argparse
 import socket
 import getpass
+import smtplib
+import socket
+import sys
 from time import sleep
 
 DHCP = 'dhcp.dtg.cl.cam.ac.uk'
@@ -37,6 +41,21 @@ TEMPLATENAME = 'DTG-template'
 # SSH
 SSHUSER = 'root'
 
+# Emails to sys-admin
+SYSADMIN_EMAIL = "oc243@cam.ac.uk"
+DTG_INFRA_EMAIL = "oc243@cl.cam.ac.uk"
+
+email_body = """
+Dear sys-admin,
+
+Please would you be so kind as to create a CNAME for {{ cname }}.dtg with
+value {{ puppy }}.dtg.
+
+Thank you
+
+
+dtg-infra
+"""
 
 def valid_ip(address):
     parts = address.split(".")
@@ -128,8 +147,20 @@ def host_build_vm(name, mac, memory, vcpus, root_fs_size, fs_location):
     run('nohup ./capture-vm-snapshot.sh %s &' % name)
 
 
+def request_cname(name, ip):
+    template = Template(email_body)
+    body = template.render({'cname': name, 'puppy': socket.gethostbyaddr(ip)})
+    msg = MIMEText(body)
+    msg['To'] = SYSADMIN_EMAIL
+    msg['CC'] = DTG_INFRA_EMAIL
+    msg['Subject'] = "CNAME for %s" % name
+    msg['From'] = DTG_INFRA_EMAIL
+    s = smtplib.SMTP('localhost')
+    s.sendmail(me, [you], msg.as_string())
+    s.quit()
+
 def new_cloned_vm(name, ip, mac, memory, vcpus,
-                  root_fs_size, data_size, data_sr, **_):
+                  root_fs_size, data_size, data_sr, no_cname, **_):
     """
     Build a new VM by cloning the most recent DTG-snapshot.
     This will give a DTG-itised VM, much faster than calling new_vm,
@@ -143,6 +174,8 @@ def new_cloned_vm(name, ip, mac, memory, vcpus,
         mac = next_mac()
     execute(host_build_cloned_vm, name, mac,
             memory, vcpus, root_fs_size, data_size, data_sr)
+    if (not no_cname) and ("test" not in name):
+        request_cname()
 
 
 @hosts(DOM0)
@@ -293,6 +326,8 @@ def main():
     parser.add_argument('-l', '--dataloc', default=SR, dest='data_sr',
                         help='Storage repository to use for '
                         'the data partition')
+    parser.add_argument('-c', '--no-cname', default='store_true', help="Don't "
+                        "email sys-admin for a CNAME.")
 
     # Name is required
     parser.add_argument('name', help='The hostname of the VM')
