@@ -236,8 +236,8 @@ def host_build_cloned_vm(name, mac, memory, vcpus,
 
     with settings(warn_only=True):
         while run('ssh -o UserKnownHostsFile=/dev/null -o '
-                  'StrictHostKeyChecking=no  %s@%s "sudo sh -c \'echo %s > '
-                  '/etc/hostname ; sudo start hostname \'"' %
+                  'StrictHostKeyChecking=no  %s@%s '
+                  '"sudo hostnamectl set-hostname %s"' %
                   (SSHUSER, dns_name, name)) == '1':
             sleep(1)
     run('nohup ssh -n -f -o UserKnownHostsFile=/dev/null -o '
