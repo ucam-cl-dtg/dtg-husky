@@ -327,7 +327,8 @@ def main():
                         help='Storage repository to use for '
                         'the data partition')
     parser.add_argument('-c', '--no-cname', action='store_true', help="Don't "
-                        "email sys-admin for a CNAME.")
+                        "email sys-admin for a CNAME. Emails are not sent "
+                        "for puppies with 'test' in the name.")
 
     # Name is required
     parser.add_argument('name', help='The hostname of the VM')
