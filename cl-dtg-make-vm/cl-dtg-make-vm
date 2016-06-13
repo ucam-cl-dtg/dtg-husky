@@ -326,7 +326,7 @@ def main():
     parser.add_argument('-l', '--dataloc', default=SR, dest='data_sr',
                         help='Storage repository to use for '
                         'the data partition')
-    parser.add_argument('-c', '--no-cname', default='store_true', help="Don't "
+    parser.add_argument('-c', '--no-cname', action='store_true', help="Don't "
                         "email sys-admin for a CNAME.")
 
     # Name is required
