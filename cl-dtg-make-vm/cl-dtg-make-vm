@@ -42,8 +42,8 @@ TEMPLATENAME = 'DTG-template'
 SSHUSER = 'root'
 
 # Emails to sys-admin
-SYSADMIN_EMAIL = "oc243@cam.ac.uk"
-DTG_INFRA_EMAIL = "oc243@cl.cam.ac.uk"
+SYSADMIN_EMAIL = "sys-admin@cl.cam.ac.uk"
+DTG_INFRA_EMAIL = "dtg-infra@cl.cam.ac.uk"
 
 email_body = """
 Dear sys-admin,
