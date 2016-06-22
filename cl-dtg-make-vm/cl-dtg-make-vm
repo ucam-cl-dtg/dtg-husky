@@ -296,12 +296,13 @@ def main():
 
     parser = argparse.ArgumentParser(
         description='Make a VM on the DTG husky cluster. The resulting VM '
-        'will, by the magic of drt24\'s puppet, contain much DTG goodness')
+        'will, contain much DTG goodness')
 
     parser.add_argument('--new-template', action='store_true',
                         help='Build a new template from the Ubuntu repos, and '
                         'apply DTG customisations. The result is stored as a '
-                        'template, rather than creating a VM')
+                        'template, rather than creating a VM. This is not'
+                        'yet fully implemented, see online documentation.')
 
     # We don't want both an IP address and MAC
     ip_mac_group = parser.add_mutually_exclusive_group()
