@@ -15,7 +15,7 @@ DHCP = 'dhcp.dtg.cl.cam.ac.uk'
 DOM0 = 'root@husky0.dtg.cl.cam.ac.uk'
 
 # OS
-TEMPLATE = '1f0a7087-a59d-8ec1-819c-508ec3b5b2ea'
+TEMPLATE = 'ce98da57-a57f-496e-7269-b7f397c6b62e'
 INSTALLREPO = 'http://www-uxsup.csx.cam.ac.uk/pub/linux/ubuntu'
 PRESEEDLOCATION = ('http://git.dtg.cl.cam.ac.uk/?p=husky/preseed.git;'
                    'a=blob_plain;f=puppy-preseed.cfg;hb=HEAD')
