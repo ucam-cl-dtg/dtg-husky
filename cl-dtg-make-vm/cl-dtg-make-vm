@@ -32,7 +32,7 @@ DEVICE = '0'
 # System
 DEFAULTVCPUS = '1'
 VCPUS_MAX = '8'
-DEFAULTMINMEMORY = '256'
+DEFAULTMINMEMORY = '512'
 DEFAULTMAXMEMORY = '512'
 
 # Template
@@ -91,7 +91,7 @@ def prepare_vm(mac, uuid, memory, vcpus):
 
     run('xe vm-memory-limits-set uuid=%s dynamic-max=%sMiB static-max=%sMiB '
         'static-min=%sMiB dynamic-min=%sMiB' %
-        (uuid, memory, memory, DEFAULTMINMEMORY, DEFAULTMINMEMORY))
+        (uuid, memory, memory, memory, memory))
 
 
 def new_vm(name, mac, memory, vcpus, root_fs_size, fs_location=SR, **_):
