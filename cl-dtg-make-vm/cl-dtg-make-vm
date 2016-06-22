@@ -144,7 +144,10 @@ def host_build_vm(name, mac, memory, vcpus, root_fs_size, fs_location):
 
     # Start a background script in dom0 that waits for installation to
     # complete, then shuts down the VM, and builds a snapshot
-    run('nohup ./dom0-vm-to-template.sh %s &' % name)
+    result = run('./dom0-vm-to-template.sh %s' % name)
+    if result.failed:
+        print(result)
+        print(result.stderr)
 
 
 def request_cname(name, ip):
