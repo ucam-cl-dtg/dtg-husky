@@ -3,7 +3,7 @@
 guest_user="root"
 
 if [ $# -lt 1 ]; then
-    echo "Usage: capture-vm-snapshot name"
+    echo "Usage: dom0-vm-to-template.sh name"
     exit 1
 fi
 
