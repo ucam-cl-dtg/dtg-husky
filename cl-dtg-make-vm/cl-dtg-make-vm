@@ -134,7 +134,7 @@ def host_build_vm(name, mac, memory, vcpus, root_fs_size, fs_location):
 
     # Set the preseed file, and pass a hostname, and password hash
     run('xe vm-param-set uuid=%s PV-args=" --quiet console=hvc0 auto=true '
-        'url=%s netcfg/get_hostname=%s xen.fifo_events=0"' %
+        'url=%s netcfg/get_hostname=%s xen.fifo_events=0 ipv6.disable=1"' %
         (new_vm_id, PRESEEDLOCATION, name))
 
     prepare_vm(mac, new_vm_id, memory, vcpus)
@@ -237,12 +237,16 @@ def host_build_cloned_vm(name, mac, memory, vcpus,
     run('xe vm-param-set name-description="%s" uuid=%s' %
         (dns_name, new_vm_id))
 
+    # Wait for ssh etc. to start
+    sleep(5)
+
     with settings(warn_only=True):
         while run('ssh -o UserKnownHostsFile=/dev/null -o '
                   'StrictHostKeyChecking=no  %s@%s '
                   '"sudo hostnamectl set-hostname %s"' %
                   (SSHUSER, dns_name, name)).failed:
             sleep(1)
+
     result = run('nohup ssh -n -f -o UserKnownHostsFile=/dev/null -o '
         'StrictHostKeyChecking=no %s@%s "/etc/rc2.d/S76vm-boot; '
         'cd /etc/puppet-bare; sudo git fetch -f '

@@ -42,6 +42,7 @@ while [ $( xe vm-list params=power-state name-label=$vm | grep running ) ]; do
     sleep 1
 done
 
+xe vm-param-set uuid=$vm_uuid PV-args=" --quiet console=hvc0 auto=true xen.fifo_events=0"
 
 vif_uuid=$(xe vif-list vm-name-label=$vm --minimal)
 if [ -n "$vif_uuid" ]; then
