@@ -238,15 +238,18 @@ def host_build_cloned_vm(name, mac, memory, vcpus,
         while run('ssh -o UserKnownHostsFile=/dev/null -o '
                   'StrictHostKeyChecking=no  %s@%s '
                   '"sudo hostnamectl set-hostname %s"' %
-                  (SSHUSER, dns_name, name)) == '1':
+                  (SSHUSER, dns_name, name)).failed:
             sleep(1)
-    run('nohup ssh -n -f -o UserKnownHostsFile=/dev/null -o '
+    result = run('nohup ssh -n -f -o UserKnownHostsFile=/dev/null -o '
         'StrictHostKeyChecking=no %s@%s "/etc/rc2.d/S76vm-boot; '
         'cd /etc/puppet-bare; sudo git fetch -f '
         'git://github.com/ucam-cl-dtg/dtg-puppet.git master:master; '
         'nohup sudo bash /etc/puppet-bare/hooks/post-update '
         '>/var/log/puppet/install-log 2>&1"' %
         (SSHUSER, dns_name))
+    if result.failed:
+        print(result)
+        print(result.stderr)
 
 
 @hosts(DHCP)
