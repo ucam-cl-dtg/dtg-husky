@@ -24,7 +24,7 @@ until [ $RET -eq 0 ]; do
     # We cannot verify the fingerprint of the host. We have just built it from
     # a fresh install, and so have no previous value to compare it with.
     # Therefore we don't check host keys
-    ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=7200 -o PreferredAuthentications=publickey ${guest_user}@${ip} <<ESSH
+    ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=120 -o PreferredAuthentications=publickey ${guest_user}@${ip} <<ESSH
 	  while [ $(pgrep puppet) ] || [ ! -d /etc/puppet ]; do
 	    sleep 2
 	  done
