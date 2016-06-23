@@ -10,6 +10,7 @@ import smtplib
 import socket
 import sys
 from time import sleep
+import getpass
 
 DHCP = 'dhcp.dtg.cl.cam.ac.uk'
 DOM0 = 'root@husky0.dtg.cl.cam.ac.uk'
@@ -48,13 +49,12 @@ DTG_INFRA_EMAIL = "dtg-infra@cl.cam.ac.uk"
 email_body = """
 Dear sys-admin,
 
-Please would you be so kind as to create a CNAME for {{ cname }}.dtg with
-value {{ puppy }}.dtg.
+Please create a CNAME for {{ cname }}.dtg with value {{ puppy }}.dtg.
 
 Thank you
 
 
-dtg-infra
+{{ userid }}
 """
 
 def valid_ip(address):
@@ -153,7 +153,10 @@ def host_build_vm(name, mac, memory, vcpus, root_fs_size, fs_location):
 
 def request_cname(name, ip):
     template = Template(email_body)
-    body = template.render({'cname': name, 'puppy': socket.gethostbyaddr(ip)})
+    body = template.render({
+        'cname': name,
+        'puppy': socket.gethostbyaddr(ip),
+        'userid': getpass.getuser()})
     msg = MIMEText(body)
     msg['To'] = SYSADMIN_EMAIL
     msg['CC'] = DTG_INFRA_EMAIL
@@ -179,7 +182,7 @@ def new_cloned_vm(name, ip, mac, memory, vcpus,
     execute(host_build_cloned_vm, name, mac,
             memory, vcpus, root_fs_size, data_size, data_sr)
     if (not no_cname) and ("test" not in name):
-        request_cname()
+        request_cname(name, ip)
 
 
 @hosts(DOM0)
