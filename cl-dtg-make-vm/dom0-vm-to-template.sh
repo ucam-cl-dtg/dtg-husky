@@ -17,7 +17,15 @@ if [ $no_vms_same_name -ne 1 ]; then
 fi
 
 vm_uuid="$(xe vm-list name-label=$vm params=uuid --minimal)"
-ip="$(xe vm-param-get param-name=networks uuid=$vm_uuid | sed -e 's_0/ip: __' -e 's/; .*$//')"
+echo 'vm_uuid:' $vm_uuid
+
+ip=""
+
+until [ $( echo $ip | grep '^[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+$' ) ]; do
+    ip="$(xe vm-param-get param-name=networks uuid=$vm_uuid | sed -e 's_0/ip: __' -e 's/; .*$//')"
+    sleep 5
+done
+echo 'vm_ip:' $ip
 
 RET=1
 until [ $RET -eq 0 ]; do
