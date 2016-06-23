@@ -146,6 +146,7 @@ def host_build_vm(name, mac, memory, vcpus, root_fs_size, fs_location):
     # complete, then shuts down the VM, and builds a snapshot
     result = run('./dom0-vm-to-template.sh %s' % name)
     if result.failed:
+        print('Failed to convert VM to template')
         print(result)
         print(result.stderr)
 
@@ -255,6 +256,7 @@ def host_build_cloned_vm(name, mac, memory, vcpus,
         '>/var/log/puppet/install-log 2>&1"' %
         (SSHUSER, dns_name))
     if result.failed:
+        print('Failed to apply puppet to new VM')
         print(result)
         print(result.stderr)
 
