@@ -176,8 +176,11 @@ def new_cloned_vm(name, ip, mac, memory, vcpus,
     execute(check_name, name)
 
     if ip is not None:
-        mac = execute(ip_to_mac, ip)
-    if mac is None:
+        if not valid_ip(ip):
+            print('Invalid ip: (%s)' % ip)
+            sys.exit(1)
+        mac = execute(ip_to_mac, ip).values()[0]# execute gives us a {'dhcp.dtg.cl,cam.ac.uk' : mac} dict and we want the value.
+    elif mac is None:
         mac = next_mac()
     execute(host_build_cloned_vm, name, mac,
             memory, vcpus, root_fs_size, data_size, data_sr)
@@ -269,8 +272,6 @@ def ip_to_mac(ip):
     """
     Convert an IP address to a MAC address by searching our DHCP config.
     """
-    if ip == "":
-        return ""
 
     mac = run('grep -B 1 %s /etc/dhcp/dhcpd.hosts | grep ethernet | '
               'sed -e \'s/.*net //\' -e \'s/;//\'' % ip)
