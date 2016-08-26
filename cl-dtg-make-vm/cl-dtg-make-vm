@@ -162,7 +162,7 @@ def request_cname(name, ip):
     msg['CC'] = DTG_INFRA_EMAIL
     msg['Subject'] = "CNAME for %s" % name
     msg['From'] = DTG_INFRA_EMAIL
-    s = smtplib.SMTP('localhost')
+    s = smtplib.SMTP('mail-serv.cl.cam.ac.uk')
     s.sendmail(me, [you], msg.as_string())
     s.quit()
 
