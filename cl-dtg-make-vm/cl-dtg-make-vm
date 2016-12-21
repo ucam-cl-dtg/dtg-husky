@@ -163,7 +163,7 @@ def request_cname(name, ip):
     msg['Subject'] = "CNAME for %s" % name
     msg['From'] = DTG_INFRA_EMAIL
     s = smtplib.SMTP('mail-serv.cl.cam.ac.uk')
-    s.sendmail(me, [you], msg.as_string())
+    s.sendmail(DTG_INFRA_EMAIL, [SYSADMIN_EMAIL, DTG_INFRA_EMAIL], msg.as_string())
     s.quit()
 
 def new_cloned_vm(name, ip, mac, memory, vcpus,
